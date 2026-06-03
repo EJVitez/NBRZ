@@ -4,216 +4,213 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NBRZ — The Block Is the Studio</title>
-  <meta name="description" content="NBRZ is an underground music production collective curating raw, undiscovered sound. Join the waitlist for early access." />
+  <meta name="description" content="NBRZ is an underground music production collective curating raw, undiscovered sound. Get early access." />
   <meta property="og:title" content="NBRZ — The Block Is the Studio" />
   <meta property="og:description" content="Underground production. Collective energy. Join the movement." />
   <meta property="og:type" content="website" />
-
-  <!-- Preconnect for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
-    rel="stylesheet"
-  />
-
   <link rel="stylesheet" href="style.css" />
-
-  <!-- SVG grain filter definition (hidden, referenced by CSS) -->
-  <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute">
-    <defs>
-      <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%"
-              color-interpolation-filters="linearRGB">
-        <feTurbulence
-          type="fractalNoise"
-          baseFrequency="0.65"
-          numOctaves="3"
-          stitchTiles="stitch"
-          result="noise"
-        />
-        <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise" />
-        <feBlend in="SourceGraphic" in2="grayNoise" mode="overlay" result="blend" />
-        <feComposite in="blend" in2="SourceGraphic" operator="in" />
-      </filter>
-    </defs>
-  </svg>
 </head>
 <body>
-
-  <!-- Grain overlay canvas -->
-  <canvas id="grain-canvas" aria-hidden="true"></canvas>
 
   <!-- ===================== NAV ===================== -->
   <nav class="nav" aria-label="Main navigation">
     <a href="#" class="nav-logo" aria-label="NBRZ home">NBRZ</a>
-    <a href="#waitlist" class="nav-cta btn btn--sm">Get Early Access</a>
+    <a href="#waitlist" class="nav-cta">Get Early Access</a>
   </nav>
 
   <!-- ===================== HERO ===================== -->
-  <section class="hero" id="home">
-    <div class="hero__inner container">
-      <div class="hero__eyebrow">
-        <span class="pill">Now Forming</span>
-      </div>
+  <section class="hero" id="home" aria-label="Hero">
+    <!-- Subtle horizontal scan-lines for depth -->
+    <div class="hero-scanlines" aria-hidden="true"></div>
 
-      <h1 class="hero__wordmark" aria-label="NBRZ">
-        <span class="wordmark-n">N</span><span class="wordmark-b">B</span><span class="wordmark-r">R</span><span class="wordmark-z">Z</span>
-      </h1>
+    <!-- Eyebrow -->
+    <p class="hero-eyebrow" aria-hidden="true">Now Forming</p>
 
-      <p class="hero__tagline">The Block Is the Studio.</p>
+    <!-- Main wordmark -->
+    <h1 class="hero-wordmark">NBRZ</h1>
 
-      <p class="hero__desc">
-        An underground music production collective — a tight-knit circle of
-        producers, beatmakers, and sound designers pushing the edges of
-        what a beat can feel like. No labels. No gates. Just sound.
-      </p>
+    <!-- Tagline -->
+    <p class="hero-tagline">
+      The Block Is <em>the Studio.</em>
+    </p>
 
-      <div class="hero__actions">
-        <a href="#waitlist" class="btn btn--primary">Join the Waitlist</a>
-        <a href="#about" class="btn btn--ghost">Our Mission</a>
-      </div>
+    <!-- Description -->
+    <p class="hero-desc">
+      An underground music production collective — a tight-knit circle of
+      producers, beatmakers, and sound designers pushing the edges of what
+      a beat can feel like. No labels. No gates. Just sound.
+    </p>
+
+    <!-- CTAs -->
+    <div class="hero-actions">
+      <a href="#waitlist" class="btn-primary">Join the Waitlist</a>
+      <a href="#about"    class="btn-ghost">Our Mission</a>
     </div>
 
-    <!-- Decorative waveform bars -->
-    <div class="hero__wave" aria-hidden="true">
-      <div class="wave-bars">
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-      </div>
+    <!-- Scroll indicator -->
+    <div class="hero-scroll" aria-hidden="true">
+      <div class="hero-scroll-line"></div>
+      <span>Scroll</span>
     </div>
   </section>
+
+  <div class="divider"></div>
 
   <!-- ===================== ABOUT ===================== -->
-  <section class="about" id="about">
-    <div class="container about__inner">
-      <div class="about__label section-label">About</div>
+  <section class="about" id="about" aria-labelledby="about-heading">
+    <div class="section-inner">
+      <div class="about-grid">
 
-      <div class="about__lines">
-        <div class="about__line">
-          <span class="about__number">01</span>
-          <p class="about__text">
-            We don't produce music for playlists.<br />
-            <strong>We produce music for moments you can't explain.</strong>
-          </p>
+        <!-- Left: headline + sound bars -->
+        <div class="reveal">
+          <p class="about-label">About NBRZ</p>
+          <h2 class="about-headline" id="about-heading">
+            Sound built<br />for the <span>underground.</span>
+          </h2>
+
+          <!-- Animated sound bars decoration -->
+          <div class="sound-bars" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
         </div>
-        <div class="about__line">
-          <span class="about__number">02</span>
-          <p class="about__text">
-            NBRZ is a collective — curators of underground sound, a network
-            of neighbors who share samples, sessions, and space.
+
+        <!-- Right: body copy -->
+        <div class="about-body">
+          <div class="about-item reveal reveal-delay-1">
+            <strong>We don't make music for playlists.</strong>
+            <p>
+              We produce for moments you can't explain — the feeling at
+              2 AM when a beat hits different and you don't know why.
+              That's the only metric that matters.
+            </p>
+          </div>
+
+          <div class="about-item reveal reveal-delay-2">
             <strong>Geography optional. Chemistry required.</strong>
-          </p>
-        </div>
-        <div class="about__line">
-          <span class="about__number">03</span>
-          <p class="about__text">
-            We're building a home for the music that lives between
-            genres — in basements, in headphones at 2 AM, in the space
-            between the snare and the silence.
+            <p>
+              NBRZ is a collective — a network of neighbors who share
+              samples, sessions, and space across cities, time zones, and
+              genres. The block isn't a place. It's a frequency.
+            </p>
+          </div>
+
+          <div class="about-item reveal reveal-delay-3">
             <strong>If you know, you know.</strong>
-          </p>
+            <p>
+              We're building a home for the music that lives between
+              genres — in basements, in headphones, in the space between
+              the snare and the silence. Underground, for keeps.
+            </p>
+          </div>
         </div>
+
       </div>
     </div>
   </section>
 
+  <div class="divider"></div>
+
   <!-- ===================== WAITLIST ===================== -->
-  <section class="waitlist" id="waitlist">
-    <div class="container waitlist__inner">
-      <div class="waitlist__label section-label">Early Access</div>
+  <section class="waitlist" id="waitlist" aria-labelledby="waitlist-heading">
+    <div class="section-inner">
+      <div class="waitlist-wrap reveal">
 
-      <h2 class="waitlist__heading">
-        Be First<br />
-        <span class="accent">When the Doors Open.</span>
-      </h2>
+        <p class="waitlist-eyebrow">Early Access</p>
 
-      <p class="waitlist__sub">
-        We're dropping exclusive beats, sample packs, and collaboration
-        invites to our inner circle first. Get on the list.
-      </p>
+        <h2 class="waitlist-headline" id="waitlist-heading">
+          Be first through<br />the door.
+        </h2>
 
-      <!-- Netlify Form -->
-      <form
-        id="waitlist-form"
-        class="waitlist__form"
-        name="waitlist"
-        method="POST"
-        data-netlify="true"
-        netlify-honeypot="bot-field"
-        novalidate
-      >
-        <!-- Netlify hidden field -->
-        <input type="hidden" name="form-name" value="waitlist" />
-
-        <!-- Honeypot -->
-        <p class="hidden-field" aria-hidden="true">
-          <label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+        <p class="waitlist-sub">
+          Exclusive beats, sample packs, and collaboration invites —
+          dropped to our inner circle first. Get on the list.
         </p>
 
-        <div class="form__row">
-          <div class="form__group">
-            <label class="form__label" for="first-name">First Name</label>
-            <input
-              class="form__input"
-              type="text"
-              id="first-name"
-              name="first_name"
-              placeholder="Your name"
-              autocomplete="given-name"
-              required
-            />
-            <span class="form__error" id="error-name" role="alert"></span>
-          </div>
+        <!-- Form wrapper (hidden after success) -->
+        <div id="form-container">
+          <form
+            id="waitlist-form"
+            class="waitlist-form"
+            name="waitlist"
+            method="POST"
+            data-netlify="true"
+            netlify-honeypot="bot-field"
+            novalidate
+          >
+            <!-- Netlify required hidden field -->
+            <input type="hidden" name="form-name" value="waitlist" />
 
-          <div class="form__group">
-            <label class="form__label" for="email">Email Address</label>
-            <input
-              class="form__input"
-              type="email"
-              id="email"
-              name="email"
-              placeholder="you@example.com"
-              autocomplete="email"
-              required
-            />
-            <span class="form__error" id="error-email" role="alert"></span>
-          </div>
+            <!-- Honeypot anti-spam -->
+            <p style="display:none" aria-hidden="true">
+              <label>Skip this: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+            </p>
+
+            <!-- First name -->
+            <div class="form-group">
+              <label for="field-name">First Name</label>
+              <input
+                type="text"
+                id="field-name"
+                name="first_name"
+                placeholder="Your name"
+                autocomplete="given-name"
+                required
+              />
+              <span class="field-error" id="error-name" role="alert"></span>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+              <label for="field-email">Email Address</label>
+              <input
+                type="email"
+                id="field-email"
+                name="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+              />
+              <span class="field-error" id="error-email" role="alert"></span>
+            </div>
+
+            <!-- Submit -->
+            <div class="form-submit-wrap">
+              <button class="btn-submit" type="submit" id="submit-btn">
+                Get Early Access
+              </button>
+            </div>
+          </form>
         </div>
 
-        <button class="btn btn--primary btn--full" type="submit" id="submit-btn">
-          <span class="btn-text">Get Early Access</span>
-          <span class="btn-loader" aria-hidden="true"></span>
-        </button>
+        <!-- Success state (shown by JS after submit) -->
+        <div class="waitlist-success" id="waitlist-success" aria-live="polite">
+          <div class="success-icon" aria-hidden="true">✦</div>
+          <p class="success-headline">You're In.</p>
+          <p class="success-sub">
+            Welcome to the neighborhood. We'll hit you when the gates open.<br />
+            Keep your ears ready.
+          </p>
+        </div>
 
-        <p class="form__disclaimer">
+        <p class="waitlist-disclaimer">
           No spam. No label politics. Just sound, straight to your inbox.
         </p>
-      </form>
 
-      <!-- Success state (hidden initially) -->
-      <div class="waitlist__success" id="waitlist-success" aria-live="polite" hidden>
-        <div class="success__icon" aria-hidden="true">✦</div>
-        <h3 class="success__heading">You're In.</h3>
-        <p class="success__text">
-          Welcome to the neighborhood. We'll hit you when the gates open.
-          Keep your ears ready.
-        </p>
       </div>
     </div>
   </section>
 
   <!-- ===================== FOOTER ===================== -->
-  <footer class="footer">
-    <div class="container footer__inner">
-      <span class="footer__logo">NBRZ</span>
-      <span class="footer__copy">&copy; <span id="footer-year"></span> NBRZ Collective. All rights reserved.</span>
-    </div>
+  <footer class="footer" role="contentinfo">
+    <span class="footer-logo">NBRZ</span>
+    <span class="footer-copy">
+      &copy; <span id="footer-year"></span> NBRZ Collective. All rights reserved.
+    </span>
   </footer>
 
   <script src="app.js"></script>
