@@ -424,6 +424,94 @@ section {
   animation: barBounce var(--dur, 1.2s) ease-in-out infinite alternate;
 }
 
+/* ── Listen / Streaming ───────────────────────────────────── */
+.listen {
+  padding: 9rem 0;
+  text-align: center;
+}
+
+.listen-eyebrow {
+  font-family: var(--font-head);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.25rem;
+}
+
+.listen-headline {
+  font-family: var(--font-head);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--white);
+  margin-bottom: 0.75rem;
+}
+
+.listen-sub {
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: var(--text-muted);
+  max-width: 400px;
+  margin: 0 auto 3.5rem;
+  line-height: 1.7;
+}
+
+.spotify-embed {
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px var(--border);
+}
+
+.spotify-embed iframe {
+  display: block;
+  border-radius: 12px;
+}
+
+.platform-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.platform-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-head);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.65rem 1.4rem;
+  transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s var(--ease);
+}
+
+.platform-link--spotify {
+  color: #1DB954;
+  border-color: rgba(29, 185, 84, 0.25);
+}
+.platform-link--spotify:hover {
+  background: rgba(29, 185, 84, 0.08);
+  border-color: #1DB954;
+  transform: translateY(-2px);
+}
+
+.platform-more {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+
 /* ── Waitlist ─────────────────────────────────────────────── */
 .waitlist {
   padding: 9rem 0;
@@ -656,6 +744,23 @@ section {
   letter-spacing: 0.18em;
   color: var(--gold);
 }
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  font-family: var(--font-head);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--gold); }
 
 .footer-copy {
   font-size: 0.75rem;
