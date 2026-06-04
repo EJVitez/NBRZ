@@ -496,20 +496,26 @@ section {
   transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s var(--ease);
 }
 
-.platform-link--spotify {
-  color: #1DB954;
-  border-color: rgba(29, 185, 84, 0.25);
-}
-.platform-link--spotify:hover {
-  background: rgba(29, 185, 84, 0.08);
-  border-color: #1DB954;
-  transform: translateY(-2px);
-}
+.platform-link--spotify { color: #1DB954; border-color: rgba(29,185,84,0.2); }
+.platform-link--spotify:hover { background: rgba(29,185,84,0.07); border-color: #1DB954; }
 
-.platform-more {
-  font-size: 0.75rem;
+.platform-link--apple { color: #fc3c44; border-color: rgba(252,60,68,0.2); }
+.platform-link--apple:hover { background: rgba(252,60,68,0.07); border-color: #fc3c44; }
+
+.platform-link--amazon { color: #00A8E0; border-color: rgba(0,168,224,0.2); }
+.platform-link--amazon:hover { background: rgba(0,168,224,0.07); border-color: #00A8E0; }
+
+.platform-link--tidal { color: #e8e6e1; border-color: rgba(232,230,225,0.2); }
+.platform-link--tidal:hover { background: rgba(232,230,225,0.07); border-color: #e8e6e1; }
+
+.platform-link--youtube { color: #FF0000; border-color: rgba(255,0,0,0.2); }
+.platform-link--youtube:hover { background: rgba(255,0,0,0.07); border-color: #FF0000; }
+
+.platform-note {
+  margin-top: 1.25rem;
+  font-size: 0.72rem;
   color: var(--text-dim);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
 }
 
 /* ── Waitlist ─────────────────────────────────────────────── */
