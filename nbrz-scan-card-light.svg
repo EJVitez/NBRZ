@@ -1,27 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="480" height="720" viewBox="0 0 480 720" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <filter id="grain">
-      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>
-      <feColorMatrix type="saturate" values="0"/>
-      <feBlend in="SourceGraphic" mode="multiply" result="blend"/>
-      <feComposite in="blend" in2="SourceGraphic" operator="in"/>
-    </filter>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5BC87A"/>
+      <stop offset="50%" stop-color="#1AADCC"/>
+      <stop offset="100%" stop-color="#0070CC"/>
+    </linearGradient>
   </defs>
-  <rect width="480" height="720" fill="#f5f3ef"/>
-  <rect width="480" height="720" fill="black" filter="url(#grain)" opacity="0.04"/>
-  <path d="M24 24 L24 56 M24 24 L56 24" stroke="#080808" stroke-width="1.5" fill="none" opacity="0.3"/>
-  <path d="M456 24 L456 56 M456 24 L424 24" stroke="#080808" stroke-width="1.5" fill="none" opacity="0.3"/>
-  <path d="M24 696 L24 664 M24 696 L56 696" stroke="#080808" stroke-width="1.5" fill="none" opacity="0.3"/>
-  <path d="M456 696 L456 664 M456 696 L424 696" stroke="#080808" stroke-width="1.5" fill="none" opacity="0.3"/>
-  <text x="240" y="70" text-anchor="middle" font-family="'Space Grotesk','Helvetica Neue',Arial,sans-serif" font-size="10" font-weight="600" letter-spacing="5" fill="#c9a84c">NOW STREAMING</text>
-  <text x="240" y="165" text-anchor="middle" font-family="'Space Grotesk','Helvetica Neue',Arial,sans-serif" font-size="108" font-weight="700" letter-spacing="-2" fill="#080808">NBRZ</text>
-  <text x="240" y="205" text-anchor="middle" font-family="'Space Grotesk','Helvetica Neue',Arial,sans-serif" font-size="13" font-weight="300" letter-spacing="1.5" fill="#7a7775">The Block Is the Studio.</text>
-  <line x1="80" y1="230" x2="400" y2="230" stroke="#080808" stroke-width="0.5" opacity="0.15"/>
-  <g transform="translate(80, 300)"><path stroke="#080808" d="M0 0.5h7m2 0h4m1 0h4m4 0h7M0 1.5h1m5 0h1m1 0h1m1 0h2m2 0h1m1 0h2m4 0h1m5 0h1M0 2.5h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h4m1 0h1m1 0h3m1 0h1M0 3.5h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m2 0h3m1 0h1m1 0h1m1 0h3m1 0h1M0 4.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h2m2 0h1m4 0h1m1 0h3m1 0h1M0 5.5h1m5 0h1m1 0h2m2 0h1m1 0h3m5 0h1m5 0h1M0 6.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M10 7.5h1m2 0h3m3 0h1M2 8.5h1m2 0h6m1 0h1m1 0h1m2 0h3m1 0h1m1 0h5M0 9.5h2m1 0h1m5 0h2m1 0h2m3 0h1m1 0h2m1 0h2m1 0h4M0 10.5h1m3 0h1m1 0h2m2 0h1m1 0h2m1 0h1m2 0h2m1 0h1m2 0h2m2 0h1M0 11.5h3m1 0h2m5 0h3m3 0h1m4 0h1m1 0h2M0 12.5h2m4 0h1m2 0h1m1 0h2m1 0h1m3 0h5m2 0h1m1 0h1M3 13.5h1m1 0h1m1 0h1m1 0h3m1 0h3m2 0h3m1 0h1m2 0h1m2 0h1M0 14.5h1m2 0h1m2 0h1m1 0h1m6 0h3m1 0h2m1 0h1m2 0h2m1 0h1M0 15.5h1m7 0h1m1 0h1m2 0h2m2 0h1m1 0h2m1 0h1m2 0h1m2 0h1M1 16.5h1m1 0h1m1 0h2m1 0h2m1 0h1m1 0h1m6 0h1m1 0h2M1 17.5h2m1 0h2m2 0h2m1 0h1m2 0h3m2 0h5m1 0h1m2 0h1M0 18.5h3m1 0h3m1 0h1m2 0h3m1 0h6m2 0h2m1 0h1m1 0h1M2 19.5h2m1 0h1m2 0h7m2 0h1m1 0h7M0 20.5h2m3 0h3m6 0h2m1 0h2m1 0h5m2 0h1M8 21.5h1m2 0h1m1 0h1m1 0h1m1 0h2m1 0h1m3 0h2m2 0h1M0 22.5h7m1 0h3m1 0h1m1 0h1m2 0h1m2 0h1m1 0h1m1 0h5M0 23.5h1m5 0h1m1 0h2m2 0h3m1 0h2m1 0h2m3 0h2m2 0h1M0 24.5h1m1 0h3m1 0h1m2 0h1m1 0h2m2 0h1m1 0h8m2 0h1M0 25.5h1m1 0h3m1 0h1m2 0h1m1 0h1m1 0h1m1 0h2m1 0h3m2 0h3m1 0h1M0 26.5h1m1 0h3m1 0h1m1 0h1m6 0h1m2 0h1m2 0h1m2 0h5M0 27.5h1m5 0h1m2 0h1m1 0h3m1 0h2m3 0h1m1 0h1m2 0h1M0 28.5h7m3 0h1m1 0h2m4 0h3m1 0h4m2 0h1"/></g>
 
-  <line x1="80" y1="632" x2="400" y2="632" stroke="#080808" stroke-width="0.5" opacity="0.15"/>
-  <text x="240" y="660" text-anchor="middle" font-family="'Space Grotesk','Helvetica Neue',Arial,sans-serif" font-size="11" font-weight="600" letter-spacing="4" fill="#c9a84c">SCAN TO LISTEN</text>
-  <text x="240" y="680" text-anchor="middle" font-family="'Space Grotesk','Helvetica Neue',Arial,sans-serif" font-size="9" font-weight="400" letter-spacing="1" fill="#7a7775">nbrz.netlify.app</text>
-  <text x="240" y="695" text-anchor="middle" font-family="'Space Grotesk','Helvetica Neue',Arial,sans-serif" font-size="9" font-weight="400" letter-spacing="1" fill="#7a7775">Spotify · Apple Music · Tidal · Amazon Music</text>
+  <rect width="480" height="720" fill="#f8f8f8"/>
+
+  <path d="M20 20 L20 52 M20 20 L52 20" stroke="#1AADCC" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M460 20 L460 52 M460 20 L428 20" stroke="#1AADCC" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M20 700 L20 668 M20 700 L52 700" stroke="#0070CC" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M460 700 L460 668 M460 700 L428 700" stroke="#0070CC" stroke-width="1.5" fill="none" opacity="0.5"/>
+
+  <text x="240" y="66" text-anchor="middle"
+    font-family="'Barlow Condensed','Arial Black',sans-serif"
+    font-size="11" font-weight="700" letter-spacing="5" fill="#1AADCC" opacity="0.8">MUSIC PRODUCTION COLLECTIVE</text>
+
+  <text x="240" y="180" text-anchor="middle"
+    font-family="'Barlow Condensed','Arial Black',sans-serif"
+    font-size="148" font-weight="900" letter-spacing="-4" fill="url(#g)">NBRZ</text>
+
+  <text x="240" y="216" text-anchor="middle"
+    font-family="'Barlow Condensed','Arial Black',sans-serif"
+    font-size="13" font-weight="700" letter-spacing="3" fill="#aaa">THE BLOCK IS THE STUDIO.</text>
+
+  <line x1="60" y1="235" x2="420" y2="235" stroke="#ccc" stroke-width="0.5"/>
+
+  <g transform="translate(80, 295)"><path stroke="#000000" d="M0 0.5h7m2 0h4m1 0h4m4 0h7M0 1.5h1m5 0h1m1 0h1m1 0h2m2 0h1m1 0h2m4 0h1m5 0h1M0 2.5h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h4m1 0h1m1 0h3m1 0h1M0 3.5h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m2 0h3m1 0h1m1 0h1m1 0h3m1 0h1M0 4.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h2m2 0h1m4 0h1m1 0h3m1 0h1M0 5.5h1m5 0h1m1 0h2m2 0h1m1 0h3m5 0h1m5 0h1M0 6.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M10 7.5h1m2 0h3m3 0h1M2 8.5h1m2 0h6m1 0h1m1 0h1m2 0h3m1 0h1m1 0h5M0 9.5h2m1 0h1m5 0h2m1 0h2m3 0h1m1 0h2m1 0h2m1 0h4M0 10.5h1m3 0h1m1 0h2m2 0h1m1 0h2m1 0h1m2 0h2m1 0h1m2 0h2m2 0h1M0 11.5h3m1 0h2m5 0h3m3 0h1m4 0h1m1 0h2M0 12.5h2m4 0h1m2 0h1m1 0h2m1 0h1m3 0h5m2 0h1m1 0h1M3 13.5h1m1 0h1m1 0h1m1 0h3m1 0h3m2 0h3m1 0h1m2 0h1m2 0h1M0 14.5h1m2 0h1m2 0h1m1 0h1m6 0h3m1 0h2m1 0h1m2 0h2m1 0h1M0 15.5h1m7 0h1m1 0h1m2 0h2m2 0h1m1 0h2m1 0h1m2 0h1m2 0h1M1 16.5h1m1 0h1m1 0h2m1 0h2m1 0h1m1 0h1m6 0h1m1 0h2M1 17.5h2m1 0h2m2 0h2m1 0h1m2 0h3m2 0h5m1 0h1m2 0h1M0 18.5h3m1 0h3m1 0h1m2 0h3m1 0h6m2 0h2m1 0h1m1 0h1M2 19.5h2m1 0h1m2 0h7m2 0h1m1 0h7M0 20.5h2m3 0h3m6 0h2m1 0h2m1 0h5m2 0h1M8 21.5h1m2 0h1m1 0h1m1 0h1m1 0h2m1 0h1m3 0h2m2 0h1M0 22.5h7m1 0h3m1 0h1m1 0h1m2 0h1m2 0h1m1 0h1m1 0h5M0 23.5h1m5 0h1m1 0h2m2 0h3m1 0h2m1 0h2m3 0h2m2 0h1M0 24.5h1m1 0h3m1 0h1m2 0h1m1 0h2m2 0h1m1 0h8m2 0h1M0 25.5h1m1 0h3m1 0h1m2 0h1m1 0h1m1 0h1m1 0h2m1 0h3m2 0h3m1 0h1M0 26.5h1m1 0h3m1 0h1m1 0h1m6 0h1m2 0h1m2 0h1m2 0h5M0 27.5h1m5 0h1m2 0h1m1 0h3m1 0h2m3 0h1m1 0h1m2 0h1M0 28.5h7m3 0h1m1 0h2m4 0h3m1 0h4m2 0h1"/></g>
+
+
+  <line x1="60" y1="627" x2="420" y2="627" stroke="#ccc" stroke-width="0.5"/>
+
+  <text x="240" y="655" text-anchor="middle"
+    font-family="'Barlow Condensed','Arial Black',sans-serif"
+    font-size="12" font-weight="700" letter-spacing="5" fill="#1AADCC">SCAN TO LISTEN</text>
+
+  <text x="240" y="675" text-anchor="middle"
+    font-family="'Barlow Condensed','Arial Black',sans-serif"
+    font-size="10" font-weight="400" letter-spacing="2" fill="#bbb">nbrz.netlify.app</text>
+
+  <text x="240" y="693" text-anchor="middle"
+    font-family="'Barlow Condensed','Arial Black',sans-serif"
+    font-size="9" font-weight="400" letter-spacing="1.5" fill="#ccc">Spotify · Apple Music · Tidal · Amazon Music</text>
 </svg>
