@@ -9,24 +9,20 @@
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://nbrz.netlify.app/" />
 
-  <!-- Open Graph -->
   <meta property="og:type" content="music.musician" />
   <meta property="og:title" content="NBRZ — Music Production Collective" />
-  <meta property="og:description" content="Underground production. Collective energy. The Block Is the Studio — streaming everywhere." />
+  <meta property="og:description" content="Underground production. Collective energy. The Block Is the Studio." />
   <meta property="og:url" content="https://nbrz.netlify.app/" />
   <meta property="og:image" content="https://nbrz.netlify.app/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:site_name" content="NBRZ" />
   <meta property="music:musician" content="https://open.spotify.com/artist/2m355dx0tY1O5CQZ99Tdz9" />
-
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="NBRZ — Music Production Collective" />
   <meta name="twitter:description" content="Underground production. Collective energy. The Block Is the Studio." />
   <meta name="twitter:image" content="https://nbrz.netlify.app/og-image.png" />
 
-  <!-- JSON-LD Structured Data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -44,198 +40,118 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,700;0,900;1,300&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
   <!-- NAV -->
-  <nav class="nav">
-    <a href="#" class="nav-logo" aria-label="NBRZ">
-      <svg class="nav-wordmark" viewBox="0 0 220 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <linearGradient id="navGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%"   stop-color="#8EF0A4"/>
-            <stop offset="50%"  stop-color="#44D4E8"/>
-            <stop offset="100%" stop-color="#2B9EFF"/>
-          </linearGradient>
-        </defs>
-        <text x="0" y="46" font-family="'Barlow Condensed', sans-serif" font-weight="900" font-size="52" fill="url(#navGrad)" letter-spacing="-1">NBRZ</text>
-      </svg>
-    </a>
-    <a href="#listen" class="nav-cta">Listen Now</a>
+  <nav class="nav" id="nav">
+    <a href="#" class="nav-logo" aria-label="NBRZ home">NBRZ</a>
+    <div class="nav-links">
+      <a href="#listen">Listen</a>
+      <a href="#about">About</a>
+      <a href="#waitlist" class="nav-cta">Join</a>
+    </div>
   </nav>
 
   <!-- HERO -->
   <section class="hero" id="home">
-    <div class="hero-inner">
-
-      <p class="hero-eyebrow">Music Production Collective</p>
-
-      <!-- NBRZ wordmark SVG — matches your actual brand -->
-      <div class="hero-wordmark-wrap" aria-label="NBRZ">
-        <svg class="hero-wordmark" viewBox="0 0 560 130" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%"   stop-color="#8EF0A4"/>
-              <stop offset="45%"  stop-color="#44D4E8"/>
-              <stop offset="100%" stop-color="#2B9EFF"/>
-            </linearGradient>
-            <filter id="heroGlow">
-              <feGaussianBlur stdDeviation="8" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
-          <text x="0" y="118"
-            font-family="'Barlow Condensed', 'Arial Black', sans-serif"
-            font-weight="900"
-            font-size="130"
-            fill="url(#heroGrad)"
-            filter="url(#heroGlow)"
-            letter-spacing="-3">NBRZ</text>
-        </svg>
-      </div>
-
-      <p class="hero-tagline">The Block Is <em>the Studio.</em></p>
-
-      <p class="hero-desc">
-        An underground music production collective — producers, beatmakers,
-        and sound designers pushing the edges of what a beat can feel like.
-        No labels. No gates. Just sound.
-      </p>
-
-      <div class="hero-actions">
-        <a href="#listen" class="btn-primary">Listen Now</a>
-        <a href="#waitlist" class="btn-ghost">Join the Waitlist</a>
-      </div>
+    <div class="hero-mark" aria-label="NBRZ">
+      <svg viewBox="0 0 480 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NBRZ">
+        <defs>
+          <linearGradient id="wg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#8EF0A4"/>
+            <stop offset="48%"  stop-color="#44D4E8"/>
+            <stop offset="100%" stop-color="#2B9EFF"/>
+          </linearGradient>
+          <filter id="wglow" x="-10%" y="-10%" width="120%" height="120%">
+            <feGaussianBlur stdDeviation="5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <text x="0" y="108"
+          font-family="'Barlow Condensed', 'Arial Black', sans-serif"
+          font-weight="900" font-size="120" letter-spacing="-3"
+          fill="url(#wg)" filter="url(#wglow)">NBRZ</text>
+      </svg>
     </div>
 
-    <div class="hero-scroll" aria-hidden="true">
-      <div class="hero-scroll-line"></div>
-      <span>Scroll</span>
-    </div>
+    <p class="hero-sub">Music Production Collective</p>
+
+    <a href="#listen" class="hero-scroll" aria-label="Scroll to music">
+      <span>↓</span>
+    </a>
   </section>
-
-  <div class="divider"></div>
-
-  <!-- ABOUT -->
-  <section class="about" id="about">
-    <div class="section-inner">
-      <div class="about-grid">
-
-        <div class="reveal">
-          <p class="section-label">About NBRZ</p>
-          <h2 class="about-headline">
-            Sound built<br />for the <span>underground.</span>
-          </h2>
-          <div class="sound-bars" aria-hidden="true">
-            <span></span><span></span><span></span><span></span><span></span>
-            <span></span><span></span><span></span><span></span><span></span>
-            <span></span><span></span><span></span><span></span><span></span>
-            <span></span><span></span><span></span><span></span><span></span>
-          </div>
-        </div>
-
-        <div class="about-body">
-          <div class="about-item reveal reveal-delay-1">
-            <strong>We don't make music for playlists.</strong>
-            <p>We produce for moments you can't explain — the feeling at 2 AM when a beat hits different and you don't know why. That's the only metric that matters.</p>
-          </div>
-          <div class="about-item reveal reveal-delay-2">
-            <strong>Geography optional. Chemistry required.</strong>
-            <p>NBRZ is a collective — a network of neighbors who share samples, sessions, and space across cities, time zones, and genres. The block isn't a place. It's a frequency.</p>
-          </div>
-          <div class="about-item reveal reveal-delay-3">
-            <strong>If you know, you know.</strong>
-            <p>We're building a home for the music that lives between genres — in basements, in headphones, in the space between the snare and the silence. Underground, for keeps.</p>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <div class="divider"></div>
 
   <!-- LISTEN -->
   <section class="listen" id="listen">
-    <div class="section-inner">
-      <p class="section-label">Now Streaming</p>
-      <h2 class="listen-headline">Hear the block.</h2>
-      <p class="listen-sub">We're on every major platform. Press play.</p>
+    <div class="wrap">
+      <h2 class="section-head">Listen.</h2>
 
-      <div class="spotify-embed reveal">
+      <div class="embed-wrap reveal">
         <iframe
           src="https://open.spotify.com/embed/artist/2m355dx0tY1O5CQZ99Tdz9?utm_source=generator&theme=0"
-          width="100%" height="352" frameborder="0"
+          width="100%" height="380" frameborder="0"
           allowfullscreen=""
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           loading="lazy" title="NBRZ on Spotify"
         ></iframe>
       </div>
 
-      <div class="platform-links reveal reveal-delay-1">
-        <a class="platform-link" href="https://open.spotify.com/artist/2m355dx0tY1O5CQZ99Tdz9" target="_blank" rel="noopener noreferrer">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-          Spotify
-        </a>
-        <a class="platform-link" id="link-apple" href="https://music.apple.com/us/artist/nbrz/1883404337" target="_blank" rel="noopener noreferrer">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.994 6.124a9.23 9.23 0 0 0-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a6.303 6.303 0 0 0-1.873-.737A9.15 9.15 0 0 0 17.906 0H6.083a9.15 9.15 0 0 0-1.795.198 6.303 6.303 0 0 0-1.874.737C1.296 1.668.563 2.668.246 3.934A9.23 9.23 0 0 0 .006 6.124C.001 6.147 0 6.169 0 6.191V17.81c0 .022.001.044.006.067a9.23 9.23 0 0 0 .24 2.19c.317 1.31 1.062 2.31 2.18 3.043a6.303 6.303 0 0 0 1.873.737A9.15 9.15 0 0 0 6.094 24h11.812a9.15 9.15 0 0 0 1.795-.198 6.303 6.303 0 0 0 1.874-.737c1.118-.733 1.863-1.733 2.18-3.043a9.23 9.23 0 0 0 .24-2.19c.005-.023.006-.045.006-.067V6.191c0-.022-.001-.044-.006-.067z"/></svg>
-          Apple Music
-        </a>
-        <a class="platform-link" href="https://music.amazon.com/search/NBRZ" target="_blank" rel="noopener noreferrer">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13.958 10.09c0 1.232.029 2.256-.591 3.351-.502.891-1.301 1.438-2.186 1.438-1.214 0-1.922-.924-1.922-2.292 0-2.692 2.415-3.182 4.699-3.182v.685zm3.186 7.705c-.209.189-.512.201-.745.074C15.235 16.85 14.865 16 14.865 16c-.927 1.065-1.582 1.385-2.782 1.385-1.418 0-2.521-.875-2.521-2.625 0-1.366.739-2.294 1.789-2.748 1.427-.616 3.42-.728 4.407-.895v-.334c0-.612.047-1.337-.314-1.866-.307-.473-.895-.669-1.412-.669-.959 0-1.816.492-2.025 1.512-.043.227-.211.452-.434.464l-2.427-.262c-.205-.046-.432-.212-.374-.527C9.605 7.073 11.855 6 13.914 6c1.052 0 2.424.279 3.253 1.074C18.19 8.1 18.18 9.37 18.18 10.738v3.495c0 .953.396 1.372.767 1.884.13.185.158.406-.008.544-.416.347-1.155 1.001-1.563 1.365l-.232-.231M20.613 19.751C18.239 21.562 14.847 22.5 11.937 22.5c-4.285 0-8.143-1.585-11.063-4.222-.229-.207-.025-.489.252-.328 3.151 1.833 7.048 2.937 11.075 2.937 2.718 0 5.704-.562 8.455-1.728.393-.167.722.258.957.592"/></svg>
-          Amazon Music
-        </a>
-        <a class="platform-link" href="https://tidal.com/search?q=NBRZ" target="_blank" rel="noopener noreferrer">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.012 3.992L8.008 7.996 4.004 3.992 0 7.996l4.004 4.004 4.004-4.004 4.004 4.004 4.004-4.004zM8.008 16.004l4.004-4.004 4.004 4.004 4.004-4.004-4.004-4.004-4.004 4.004-4.004-4.004L4.004 12z"/></svg>
-          Tidal
-        </a>
-        <a class="platform-link" href="https://music.youtube.com/search?q=NBRZ" target="_blank" rel="noopener noreferrer">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>
-          YouTube Music
-        </a>
+      <div class="platforms reveal">
+        <a href="https://open.spotify.com/artist/2m355dx0tY1O5CQZ99Tdz9" target="_blank" rel="noopener noreferrer">Spotify</a>
+        <span aria-hidden="true">—</span>
+        <a href="https://music.apple.com/us/artist/nbrz/1883404337" target="_blank" rel="noopener noreferrer">Apple Music</a>
+        <span aria-hidden="true">—</span>
+        <a href="https://music.amazon.com/search/NBRZ" target="_blank" rel="noopener noreferrer">Amazon Music</a>
+        <span aria-hidden="true">—</span>
+        <a href="https://tidal.com/search?q=NBRZ" target="_blank" rel="noopener noreferrer">Tidal</a>
+        <span aria-hidden="true">—</span>
+        <a href="https://music.youtube.com/search?q=NBRZ" target="_blank" rel="noopener noreferrer">YouTube Music</a>
       </div>
     </div>
   </section>
 
-  <div class="divider"></div>
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="wrap">
+      <div class="about-text reveal">
+        <p>We don't make music for playlists.</p>
+        <p>We make it for the 2 AM feeling you can't name.</p>
+        <p class="muted">NBRZ is a collective of producers, beatmakers, and sound designers operating between genres — underground, for keeps.</p>
+      </div>
+    </div>
+  </section>
 
   <!-- WAITLIST -->
   <section class="waitlist" id="waitlist">
-    <div class="section-inner">
-      <div class="waitlist-wrap reveal">
-        <p class="section-label">Early Access</p>
-        <h2 class="waitlist-headline">Be first through<br />the door.</h2>
-        <p class="waitlist-sub">Exclusive beats, sample packs, and collaboration invites — dropped to our inner circle first.</p>
+    <div class="wrap">
+      <div class="waitlist-inner reveal">
+        <h2 class="section-head">Get In.</h2>
+        <p class="waitlist-sub">Exclusive drops, sample packs, and collabs — inner circle first.</p>
 
         <div id="form-container">
-          <form id="waitlist-form" class="waitlist-form" name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+          <form id="waitlist-form" name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
             <input type="hidden" name="form-name" value="waitlist" />
             <p style="display:none" aria-hidden="true"><label>Skip: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
-            <div class="form-group">
-              <label for="field-name">First Name</label>
-              <input type="text" id="field-name" name="first_name" placeholder="Your name" autocomplete="given-name" required />
+
+            <div class="form-row">
+              <input type="text" id="field-name" name="first_name" placeholder="Name" autocomplete="given-name" required />
+              <input type="email" id="field-email" name="email" placeholder="Email" autocomplete="email" required />
+              <button type="submit" id="submit-btn">→</button>
+            </div>
+            <div class="form-errors">
               <span class="field-error" id="error-name" role="alert"></span>
-            </div>
-            <div class="form-group">
-              <label for="field-email">Email Address</label>
-              <input type="email" id="field-email" name="email" placeholder="you@example.com" autocomplete="email" required />
               <span class="field-error" id="error-email" role="alert"></span>
-            </div>
-            <div class="form-submit-wrap">
-              <button class="btn-submit" type="submit" id="submit-btn">Get Early Access</button>
             </div>
           </form>
         </div>
 
         <div class="waitlist-success" id="waitlist-success" aria-live="polite">
-          <div class="success-icon" aria-hidden="true">✦</div>
-          <p class="success-headline">You're In.</p>
-          <p class="success-sub">Welcome to the neighborhood. We'll hit you when the gates open.</p>
+          <p class="success-headline">You're in.</p>
+          <p class="muted">We'll hit you when the gates open.</p>
         </div>
-
-        <p class="waitlist-disclaimer">No spam. No label politics. Just sound.</p>
       </div>
     </div>
   </section>
@@ -243,10 +159,7 @@
   <!-- FOOTER -->
   <footer class="footer">
     <span class="footer-logo">NBRZ</span>
-    <nav class="footer-links">
-      <a href="https://open.spotify.com/artist/2m355dx0tY1O5CQZ99Tdz9" target="_blank" rel="noopener noreferrer">Spotify</a>
-    </nav>
-    <span class="footer-copy">&copy; <span id="footer-year"></span> NBRZ Collective.</span>
+    <span class="footer-copy">&copy; <span id="footer-year"></span> NBRZ Collective</span>
   </footer>
 
   <script src="app.js"></script>
