@@ -92,12 +92,17 @@ body::after {
   overflow: hidden;
 }
 
-/* Radial cyan glow — subtle */
+/* Radial cyan glow — animated pulse */
 .hero::before {
   content: '';
   position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(ellipse 55% 45% at 50% 50%,
-    rgba(68,212,232,0.06) 0%, transparent 70%);
+    rgba(68,212,232,0.07) 0%, transparent 70%);
+  animation: heroGlow 6s ease-in-out infinite alternate;
+}
+@keyframes heroGlow {
+  from { opacity: 0.7; transform: scale(1); }
+  to   { opacity: 1;   transform: scale(1.08); }
 }
 
 .hero-mark {
@@ -135,6 +140,38 @@ section { padding: 8rem 0; }
   color: var(--white); margin-bottom: 3rem;
 }
 
+/* ── MARQUEE ── */
+.marquee-wrap {
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0;
+  background: var(--black);
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.marquee-track {
+  display: inline-block;
+  animation: marquee 60s linear infinite;
+}
+.marquee-wrap:hover .marquee-track { animation-play-state: paused; }
+
+.marquee-track span {
+  font-family: var(--fh); font-weight: 700; font-size: 0.78rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin: 0 0.1em;
+  transition: color 0.2s;
+}
+.marquee-track span:not(.dot):hover { color: var(--cyan); }
+.marquee-track .dot { color: var(--dim); margin: 0 0.6em; }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
 /* ── LISTEN ── */
 .listen { padding-top: 7rem; }
 
@@ -158,6 +195,27 @@ section { padding: 8rem 0; }
 
 /* ── ABOUT ── */
 .about { border-top: 1px solid var(--border); }
+
+.about-stats {
+  display: flex; gap: 0; margin-bottom: 5rem;
+  border: 1px solid var(--border); border-radius: 2px; overflow: hidden;
+}
+.stat {
+  flex: 1; padding: 2rem 1.5rem;
+  display: flex; flex-direction: column; gap: 0.35rem;
+  border-right: 1px solid var(--border);
+}
+.stat:last-child { border-right: none; }
+.stat-n {
+  font-family: var(--fh); font-weight: 900; font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: -0.02em; line-height: 1;
+  background: var(--grad-t); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; background-clip: text;
+}
+.stat-l {
+  font-family: var(--fh); font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+}
 
 .about-text {
   display: flex; flex-direction: column; gap: 0;
