@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="480" height="720" viewBox="0 0 480 720" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="wordGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#f5f3ef"/>
+      <stop offset="42%"  stop-color="#c9a84c"/>
+      <stop offset="62%"  stop-color="#e8d99a"/>
+      <stop offset="78%"  stop-color="#c9a84c"/>
+      <stop offset="100%" stop-color="#7a6530"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- grain texture -->
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feBlend in="SourceGraphic" mode="overlay" result="blend"/>
+      <feComposite in="blend" in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="480" height="720" fill="#080808"/>
+
+  <!-- Grain overlay -->
+  <rect width="480" height="720" fill="white" filter="url(#grain)" opacity="0.035"/>
+
+  <!-- Gold radial glow behind wordmark -->
+  <ellipse cx="240" cy="130" rx="200" ry="90" fill="rgba(201,168,76,0.07)"/>
+
+  <!-- Corner brackets -->
+  <path d="M24 24 L24 56 M24 24 L56 24" stroke="#c9a84c" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M456 24 L456 56 M456 24 L424 24" stroke="#c9a84c" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M24 696 L24 664 M24 696 L56 696" stroke="#c9a84c" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M456 696 L456 664 M456 696 L424 696" stroke="#c9a84c" stroke-width="1.5" fill="none" opacity="0.5"/>
+
+  <!-- Eyebrow -->
+  <text x="240" y="72" text-anchor="middle"
+    font-family="'Space Grotesk', 'Helvetica Neue', Arial, sans-serif"
+    font-size="10" font-weight="600" letter-spacing="5"
+    fill="#c9a84c" opacity="0.8">NOW STREAMING</text>
+
+  <!-- NBRZ wordmark -->
+  <text x="240" y="170" text-anchor="middle"
+    font-family="'Space Grotesk', 'Helvetica Neue', Arial, sans-serif"
+    font-size="108" font-weight="700" letter-spacing="-2"
+    fill="url(#wordGrad)" filter="url(#glow)">NBRZ</text>
+
+  <!-- Tagline -->
+  <text x="240" y="210" text-anchor="middle"
+    font-family="'Space Grotesk', 'Helvetica Neue', Arial, sans-serif"
+    font-size="13" font-weight="300" letter-spacing="1.5"
+    fill="#7a7775">The Block Is the Studio.</text>
+
+  <!-- Divider -->
+  <line x1="80" y1="238" x2="400" y2="238" stroke="#c9a84c" stroke-width="0.5" opacity="0.25"/>
+
+  <!-- QR Code (gold on transparent, scaled and centered) -->
+  <g transform="translate(80, 320)"><path stroke="#c9a84c" d="M0 0.5h7m2 0h5m2 0h2m2 0h2m2 0h4m6 0h7M0 1.5h1m5 0h1m2 0h2m3 0h2m2 0h6m1 0h2m1 0h5m1 0h1m5 0h1M0 2.5h1m1 0h3m1 0h1m1 0h2m3 0h5m1 0h1m1 0h8m1 0h3m1 0h1m1 0h3m1 0h1M0 3.5h1m1 0h3m1 0h1m1 0h6m1 0h2m1 0h2m3 0h1m2 0h1m1 0h3m1 0h1m1 0h1m1 0h3m1 0h1M0 4.5h1m1 0h3m1 0h1m6 0h2m4 0h1m1 0h4m3 0h1m2 0h1m2 0h1m1 0h3m1 0h1M0 5.5h1m5 0h1m2 0h1m1 0h3m4 0h2m2 0h1m1 0h2m2 0h1m3 0h1m1 0h1m5 0h1M0 6.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M11 7.5h3m3 0h1m1 0h1m1 0h1m3 0h1m2 0h1M3 8.5h2m1 0h2m2 0h2m2 0h1m1 0h8m2 0h2m1 0h1m7 0h2M2 9.5h4m1 0h2m3 0h1m2 0h4m1 0h3m2 0h1m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m3 0h1M1 10.5h1m1 0h2m1 0h3m1 0h1m1 0h1m3 0h2m1 0h1m2 0h2m1 0h1m1 0h1m1 0h1m3 0h2m1 0h1m1 0h1M0 11.5h1m4 0h1m1 0h1m2 0h1m1 0h1m2 0h1m1 0h1m1 0h1m3 0h5m1 0h1m1 0h4m2 0h1m1 0h2M0 12.5h1m1 0h2m2 0h1m4 0h3m1 0h4m1 0h5m1 0h1m1 0h1m1 0h1m2 0h2m5 0h1M0 13.5h1m2 0h1m1 0h1m1 0h2m1 0h1m1 0h1m1 0h5m1 0h1m1 0h1m3 0h1m1 0h3m2 0h4m2 0h2M1 14.5h1m3 0h3m2 0h2m3 0h1m1 0h7m1 0h1m2 0h1m1 0h2m1 0h2m3 0h1m1 0h1M0 15.5h2m1 0h1m5 0h2m4 0h2m1 0h1m3 0h1m1 0h1m2 0h1m2 0h1m2 0h1m1 0h5M5 16.5h2m2 0h3m2 0h1m2 0h3m2 0h2m2 0h1m1 0h1m1 0h1m1 0h2m3 0h1m1 0h1M1 17.5h1m3 0h1m1 0h1m1 0h1m1 0h1m1 0h5m2 0h1m2 0h1m1 0h1m1 0h2m2 0h3m2 0h2M2 18.5h1m1 0h1m1 0h1m3 0h1m1 0h1m1 0h1m1 0h3m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m1 0h4m1 0h1M0 19.5h1m2 0h2m3 0h1m1 0h2m1 0h3m1 0h3m2 0h1m1 0h1m6 0h1m1 0h1m2 0h3M1 20.5h1m1 0h4m2 0h1m1 0h1m3 0h2m1 0h1m3 0h2m2 0h1m3 0h2m1 0h3m1 0h4M0 21.5h3m6 0h1m1 0h1m2 0h2m1 0h4m1 0h2m3 0h1m2 0h2m4 0h1m1 0h1M0 22.5h2m2 0h1m1 0h1m2 0h3m1 0h2m1 0h2m2 0h2m2 0h1m2 0h1m1 0h2m2 0h1m1 0h1m1 0h1M0 23.5h6m2 0h1m7 0h2m2 0h2m1 0h9m1 0h1m1 0h1m1 0h1M1 24.5h1m1 0h1m1 0h3m1 0h1m1 0h3m4 0h3m2 0h2m1 0h3m2 0h5m2 0h1m1 0h1M0 25.5h2m3 0h1m2 0h1m1 0h1m2 0h5m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h5m1 0h3M5 26.5h2m1 0h3m2 0h1m2 0h2m4 0h1m4 0h3m1 0h3m3 0h1m1 0h2M0 27.5h1m1 0h3m2 0h1m2 0h6m4 0h2m5 0h1m3 0h1m1 0h2m1 0h4M2 28.5h1m3 0h2m1 0h1m5 0h1m3 0h1m1 0h1m1 0h1m1 0h1m2 0h1m2 0h2m2 0h1m1 0h1m2 0h1M0 29.5h1m1 0h1m5 0h5m2 0h2m1 0h1m1 0h3m2 0h2m1 0h7m1 0h2m1 0h1M0 30.5h2m1 0h4m1 0h3m2 0h3m2 0h3m1 0h2m2 0h2m1 0h5m2 0h3m1 0h1M0 31.5h6m3 0h4m2 0h1m1 0h3m1 0h1m8 0h2m2 0h1m3 0h2M0 32.5h3m1 0h3m1 0h7m1 0h6m3 0h3m1 0h1m1 0h9M8 33.5h2m1 0h2m2 0h2m4 0h1m2 0h3m2 0h1m1 0h2m3 0h2m1 0h1M0 34.5h7m1 0h1m7 0h2m1 0h1m1 0h1m3 0h3m3 0h2m1 0h1m1 0h2M0 35.5h1m5 0h1m3 0h2m1 0h3m3 0h1m2 0h3m5 0h1m1 0h1m3 0h1m2 0h1M0 36.5h1m1 0h3m1 0h1m1 0h1m5 0h1m4 0h9m1 0h1m1 0h6m2 0h2M0 37.5h1m1 0h3m1 0h1m1 0h4m1 0h2m1 0h3m1 0h1m2 0h2m2 0h2m1 0h1m1 0h1m2 0h1m1 0h4M0 38.5h1m1 0h3m1 0h1m2 0h5m5 0h2m1 0h1m1 0h1m2 0h1m5 0h1m1 0h2m2 0h2M0 39.5h1m5 0h1m3 0h1m4 0h1m2 0h1m9 0h1m4 0h1m2 0h3m1 0h1M0 40.5h7m3 0h3m4 0h1m1 0h1m4 0h4m3 0h4m1 0h3"/></g>
+
+
+  <!-- Divider -->
+  <line x1="80" y1="648" x2="400" y2="648" stroke="#c9a84c" stroke-width="0.5" opacity="0.25"/>
+
+  <!-- CTA text -->
+  <text x="240" y="682" text-anchor="middle"
+    font-family="'Space Grotesk', 'Helvetica Neue', Arial, sans-serif"
+    font-size="11" font-weight="600" letter-spacing="4"
+    fill="#c9a84c" opacity="0.9">SCAN TO LISTEN</text>
+
+  <!-- Spotify note -->
+  <text x="240" y="702" text-anchor="middle"
+    font-family="'Space Grotesk', 'Helvetica Neue', Arial, sans-serif"
+    font-size="9" font-weight="400" letter-spacing="1"
+    fill="#3d3c3a">Spotify · Apple Music · Tidal · Amazon Music</text>
+</svg>
