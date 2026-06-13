@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NBRZ Studio — AI Generator</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0a0a0f;
+    --surface:   #13131a;
+    --surface2:  #1c1c27;
+    --border:    #2a2a3a;
+    --accent:    #7c5cfc;
+    --accent2:   #e040fb;
+    --text:      #e8e8f0;
+    --muted:     #6b6b80;
+    --success:   #22c55e;
+    --danger:    #ef4444;
+    --panel-w:   380px;
+    --radius:    12px;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  /* ── Header ─────────────────────────────── */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .mode-toggle {
+    display: flex;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-left: auto;
+  }
+
+  .mode-toggle button {
+    padding: 7px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .mode-toggle button.active {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .settings-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 7px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color .2s;
+  }
+  .settings-btn:hover { color: var(--text); }
+
+  /* ── Layout ──────────────────────────────── */
+  .app-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── Left Panel ──────────────────────────── */
+  .panel {
+    width: var(--panel-w);
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .panel::-webkit-scrollbar { width: 4px; }
+  .panel::-webkit-scrollbar-track { background: transparent; }
+  .panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .panel-section {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* Prompt */
+  textarea.prompt {
+    width: 100%;
+    min-height: 110px;
+    resize: vertical;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 14px;
+    padding: 12px;
+    line-height: 1.5;
+    outline: none;
+    transition: border-color .2s;
+    font-family: inherit;
+  }
+  textarea.prompt:focus { border-color: var(--accent); }
+
+  textarea.prompt::placeholder { color: var(--muted); }
+
+  .char-count {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    margin-top: 5px;
+  }
+
+  /* Reference image drop zone */
+  .dropzone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+    background: var(--surface2);
+  }
+
+  .dropzone.drag-over {
+    border-color: var(--accent);
+    background: rgba(124,92,252,.08);
+  }
+
+  .dropzone.has-image {
+    border-style: solid;
+    border-color: var(--accent);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .dropzone img.preview {
+    width: 100%;
+    display: block;
+    border-radius: calc(var(--radius) - 2px);
+    max-height: 200px;
+    object-fit: cover;
+  }
+
+  .dropzone-icon { font-size: 28px; margin-bottom: 8px; }
+
+  .dropzone-text {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .dropzone-text strong { color: var(--accent); }
+
+  .dropzone input[type=file] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .remove-image-btn {
+    position: absolute;
+    top: 6px; right: 6px;
+    background: rgba(0,0,0,.7);
+    border: none;
+    color: #fff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+
+  .dropzone.has-image .remove-image-btn { display: flex; }
+
+  /* Select / inputs */
+  select, input[type=text], input[type=password], input[type=number] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 9px 11px;
+    outline: none;
+    transition: border-color .2s;
+    font-family: inherit;
+    appearance: none;
+  }
+
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b80' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+
+  select:focus, input:focus { border-color: var(--accent); }
+
+  .field { margin-bottom: 10px; }
+  .field:last-child { margin-bottom: 0; }
+
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Params grid */
+  .params-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* Slider */
+  .slider-wrap { display: flex; align-items: center; gap: 8px; }
+  input[type=range] {
+    flex: 1;
+    accent-color: var(--accent);
+    height: 3px;
+    background: transparent;
+    cursor: pointer;
+  }
+  .slider-val { font-size: 12px; color: var(--text); min-width: 28px; text-align: right; }
+
+  /* Toggle row */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text);
+    padding: 4px 0;
+  }
+
+  .toggle {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .toggle input { opacity: 0; width: 0; height: 0; }
+
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background .2s;
+  }
+
+  .toggle input:checked + .toggle-track { background: var(--accent); }
+
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform .2s;
+  }
+
+  .toggle input:checked + .toggle-track::after { transform: translateX(16px); }
+
+  /* API keys collapsible */
+  .collapsible-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .collapsible-chevron {
+    font-size: 11px;
+    color: var(--muted);
+    transition: transform .2s;
+  }
+
+  .collapsible-body {
+    display: none;
+    padding-top: 12px;
+  }
+
+  .collapsible-body.open { display: block; }
+  .collapsible-header.open .collapsible-chevron { transform: rotate(180deg); }
+
+  .api-key-field { position: relative; }
+  .api-key-field input { padding-right: 36px; }
+  .key-eye {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px;
+  }
+
+  /* Generate button */
+  .generate-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    cursor: pointer;
+    transition: opacity .2s, transform .1s;
+    letter-spacing: .02em;
+  }
+
+  .generate-btn:hover { opacity: .9; }
+  .generate-btn:active { transform: scale(.98); }
+  .generate-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+  .generate-btn .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    display: none;
+  }
+
+  .generate-btn.loading .spinner { display: block; }
+  .generate-btn.loading .btn-label { display: none; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Gallery ──────────────────────────────── */
+  .gallery-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .gallery-area::-webkit-scrollbar { width: 6px; }
+  .gallery-area::-webkit-scrollbar-track { background: transparent; }
+  .gallery-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .gallery-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    text-align: center;
+    gap: 12px;
+    user-select: none;
+  }
+
+  .gallery-empty-icon { font-size: 52px; opacity: .35; }
+  .gallery-empty-title { font-size: 16px; font-weight: 600; color: var(--text); opacity: .4; }
+  .gallery-empty-sub { font-size: 13px; opacity: .5; }
+
+  .gallery-grid {
+    columns: 2;
+    column-gap: 14px;
+    width: 100%;
+  }
+
+  @media (min-width: 1400px) { .gallery-grid { columns: 3; } }
+  @media (max-width: 900px) { .gallery-grid { columns: 1; } }
+
+  .gallery-item {
+    break-inside: avoid;
+    margin-bottom: 14px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    position: relative;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+  }
+
+  .gallery-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  }
+
+  .gallery-item img,
+  .gallery-item video {
+    width: 100%;
+    display: block;
+  }
+
+  .gallery-item .item-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.75) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity .2s;
+    display: flex;
+    align-items: flex-end;
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .gallery-item:hover .item-overlay { opacity: 1; }
+
+  .item-action {
+    background: rgba(255,255,255,.15);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,.2);
+    color: #fff;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: background .2s;
+  }
+
+  .item-action:hover { background: rgba(255,255,255,.25); }
+
+  .item-meta {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0,0,0,.6);
+    backdrop-filter: blur(4px);
+    border-radius: 5px;
+    padding: 3px 7px;
+    font-size: 10px;
+    color: rgba(255,255,255,.8);
+    font-weight: 600;
+    letter-spacing: .04em;
+  }
+
+  .item-error {
+    padding: 20px;
+    text-align: center;
+    color: var(--danger);
+    font-size: 13px;
+  }
+
+  /* Skeleton loading card */
+  .skeleton-card {
+    break-inside: avoid;
+    margin-bottom: 14px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+  }
+
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  /* Toast */
+  #toast-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  .toast {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--text);
+    box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    animation: toast-in .25s ease;
+    pointer-events: auto;
+  }
+
+  .toast.error { border-color: var(--danger); color: var(--danger); }
+  .toast.success { border-color: var(--success); color: var(--success); }
+
+  @keyframes toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+  /* Settings modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-backdrop.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: min(480px, 95vw);
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .modal-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  .modal-close {
+    float: right;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    margin-top: -2px;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.92);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .lightbox.open { display: flex; }
+
+  .lightbox img, .lightbox video {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: var(--radius);
+    object-fit: contain;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 16px; right: 20px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+    opacity: .7;
+  }
+  .lightbox-close:hover { opacity: 1; }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .app-body { flex-direction: column; }
+    .panel { width: 100%; flex-shrink: 0; height: 50dvh; border-right: none; border-bottom: 1px solid var(--border); }
+    .gallery-area { height: 50dvh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────── -->
+<header>
+  <span class="logo">NBRZ</span>
+  <span style="font-size:12px;color:var(--muted);font-weight:600">Studio</span>
+
+  <div class="mode-toggle">
+    <button class="active" id="mode-image" onclick="setMode('image')">
+      🖼 Image
+    </button>
+    <button id="mode-video" onclick="setMode('video')">
+      🎬 Video
+    </button>
+  </div>
+
+  <button class="settings-btn" onclick="openModal()" title="API Keys">⚙</button>
+</header>
+
+<!-- ── Body ───────────────────────────────────────────────── -->
+<div class="app-body">
+
+  <!-- Left Panel -->
+  <aside class="panel" id="panel">
+
+    <!-- Prompt -->
+    <div class="panel-section">
+      <div class="section-label">Prompt</div>
+      <textarea class="prompt" id="prompt" placeholder="Describe the image you want to generate…" maxlength="4000" oninput="updateCharCount()"></textarea>
+      <div class="char-count"><span id="char-count">0</span> / 4000</div>
+    </div>
+
+    <!-- Reference image -->
+    <div class="panel-section">
+      <div class="section-label">Reference Image <span style="color:var(--muted);font-weight:400;text-transform:none;font-size:10px">(optional)</span></div>
+      <div class="dropzone" id="dropzone"
+        ondragover="handleDragOver(event)"
+        ondragleave="handleDragLeave(event)"
+        ondrop="handleDrop(event)"
+        onclick="document.getElementById('file-input').click()">
+        <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)" />
+        <div id="dz-placeholder">
+          <div class="dropzone-icon">📎</div>
+          <div class="dropzone-text">
+            <strong>Click or drag</strong> to upload<br>
+            PNG, JPG, WebP, GIF
+          </div>
+        </div>
+        <img class="preview" id="dz-preview" style="display:none" alt="Reference" />
+        <button class="remove-image-btn" onclick="removeImage(event)">✕</button>
+      </div>
+    </div>
+
+    <!-- Model selection -->
+    <div class="panel-section" id="model-section">
+      <div class="section-label">Model</div>
+      <div class="field">
+        <select id="model-select" onchange="onModelChange()">
+          <optgroup label="OpenAI">
+            <option value="openai-gpt4o">GPT-4o Images</option>
+            <option value="openai-dalle3">DALL-E 3</option>
+          </optgroup>
+          <optgroup label="Google">
+            <option value="gemini-imagen3">Gemini Imagen 3</option>
+            <option value="gemini-flash">Gemini 2.0 Flash (image gen)</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+
+    <!-- Parameters (image mode) -->
+    <div class="panel-section" id="params-image">
+      <div class="section-label">Parameters</div>
+
+      <div class="params-grid">
+        <div class="field">
+          <div class="field-label">Aspect Ratio</div>
+          <select id="aspect-ratio">
+            <option value="1:1">1:1 Square</option>
+            <option value="16:9">16:9 Landscape</option>
+            <option value="9:16">9:16 Portrait</option>
+            <option value="4:3">4:3 Classic</option>
+            <option value="3:2">3:2 Photo</option>
+            <option value="2:3">2:3 Portrait</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Quality</div>
+          <select id="quality">
+            <option value="standard">Standard</option>
+            <option value="hd" selected>HD</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:10px">
+        <div class="field-label">Style</div>
+        <select id="style">
+          <option value="">Auto</option>
+          <option value="vivid">Vivid</option>
+          <option value="natural">Natural</option>
+          <option value="photorealistic">Photorealistic</option>
+          <option value="digital_art">Digital Art</option>
+          <option value="cinematic">Cinematic</option>
+        </select>
+      </div>
+
+      <div class="field" style="margin-top:10px">
+        <div class="field-label">
+          Count
+          <span id="count-val" class="slider-val">1</span>
+        </div>
+        <input type="range" id="count" min="1" max="4" value="1" oninput="document.getElementById('count-val').textContent=this.value" />
+      </div>
+
+      <div class="toggle-row" style="margin-top:8px">
+        <span>Enhance prompt (AI rewrite)</span>
+        <label class="toggle">
+          <input type="checkbox" id="enhance-prompt" checked />
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Parameters (video mode) -->
+    <div class="panel-section" id="params-video" style="display:none">
+      <div class="section-label">Parameters</div>
+
+      <div class="field">
+        <div class="field-label">Duration</div>
+        <select id="video-duration">
+          <option value="4">4 seconds</option>
+          <option value="8" selected>8 seconds</option>
+          <option value="16">16 seconds</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Aspect Ratio</div>
+        <select id="video-aspect">
+          <option value="16:9">16:9 Widescreen</option>
+          <option value="9:16">9:16 Vertical</option>
+          <option value="1:1">1:1 Square</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Motion Style</div>
+        <select id="video-motion">
+          <option value="">Auto</option>
+          <option value="smooth">Smooth</option>
+          <option value="dynamic">Dynamic</option>
+          <option value="cinematic">Cinematic pan</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Generate -->
+    <div class="panel-section" style="border-bottom:none">
+      <button class="generate-btn" id="generate-btn" onclick="generate()">
+        <div class="spinner"></div>
+        <span class="btn-label">✦ Generate</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- Right Gallery -->
+  <main class="gallery-area" id="gallery-area">
+    <div class="gallery-empty" id="gallery-empty">
+      <div class="gallery-empty-icon">✦</div>
+      <div class="gallery-empty-title">Your creations will appear here</div>
+      <div class="gallery-empty-sub">Enter a prompt and hit Generate</div>
+    </div>
+    <div class="gallery-grid" id="gallery-grid" style="display:none"></div>
+  </main>
+
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Settings / API keys modal -->
+<div class="modal-backdrop" id="settings-modal" onclick="closeModalOnBackdrop(event)">
+  <div class="modal">
+    <div class="modal-title">
+      API Keys
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="field" style="margin-bottom:16px">
+      <div class="field-label">OpenAI API Key</div>
+      <div class="api-key-field">
+        <input type="password" id="key-openai" placeholder="sk-…" oninput="saveKeys()" />
+        <button class="key-eye" onclick="toggleKey('key-openai')">👁</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Used for GPT-4o Images &amp; DALL-E 3</div>
+    </div>
+
+    <div class="field" style="margin-bottom:16px">
+      <div class="field-label">Google AI (Gemini) API Key</div>
+      <div class="api-key-field">
+        <input type="password" id="key-gemini" placeholder="AIza…" oninput="saveKeys()" />
+        <button class="key-eye" onclick="toggleKey('key-gemini')">👁</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Used for Imagen 3 &amp; Gemini Flash image generation</div>
+    </div>
+
+    <div style="background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.25);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);line-height:1.5">
+      🔒 Keys are stored only in your browser's localStorage and never sent to any server other than the respective AI provider.
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="" style="display:none" />
+  <video id="lightbox-vid" controls style="display:none"></video>
+</div>
+
+<script>
+/* ────────────────────────────────────────────
+   State
+──────────────────────────────────────────── */
+let currentMode = 'image';
+let referenceFile = null;
+let referenceDataUrl = null;
+let isGenerating = false;
+
+/* ────────────────────────────────────────────
+   Init
+──────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  loadKeys();
+});
+
+/* ────────────────────────────────────────────
+   Mode
+──────────────────────────────────────────── */
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('mode-image').classList.toggle('active', mode === 'image');
+  document.getElementById('mode-video').classList.toggle('active', mode === 'video');
+
+  const imgParams = document.getElementById('params-image');
+  const vidParams = document.getElementById('params-video');
+  const modelSel  = document.getElementById('model-select');
+  const prompt    = document.getElementById('prompt');
+
+  if (mode === 'image') {
+    imgParams.style.display = '';
+    vidParams.style.display = 'none';
+    prompt.placeholder = 'Describe the image you want to generate…';
+
+    // Restore image model options
+    modelSel.innerHTML = `
+      <optgroup label="OpenAI">
+        <option value="openai-gpt4o">GPT-4o Images</option>
+        <option value="openai-dalle3">DALL-E 3</option>
+      </optgroup>
+      <optgroup label="Google">
+        <option value="gemini-imagen3">Gemini Imagen 3</option>
+        <option value="gemini-flash">Gemini 2.0 Flash (image gen)</option>
+      </optgroup>
+    `;
+  } else {
+    imgParams.style.display = 'none';
+    vidParams.style.display = '';
+    prompt.placeholder = 'Describe the video you want to generate…';
+
+    modelSel.innerHTML = `
+      <optgroup label="Meta AI">
+        <option value="meta-emu-video">Emu Video (Meta)</option>
+        <option value="meta-movie-gen">Movie Gen (Meta)</option>
+      </optgroup>
+      <optgroup label="Google">
+        <option value="google-veo2">Veo 2 (Google)</option>
+      </optgroup>
+    `;
+  }
+}
+
+function onModelChange() {
+  // Future: show/hide model-specific params
+}
+
+/* ────────────────────────────────────────────
+   Prompt char count
+──────────────────────────────────────────── */
+function updateCharCount() {
+  const v = document.getElementById('prompt').value.length;
+  document.getElementById('char-count').textContent = v;
+}
+
+/* ────────────────────────────────────────────
+   Drop zone
+──────────────────────────────────────────── */
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+  document.getElementById('dropzone').classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  const dz = document.getElementById('dropzone');
+  dz.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) applyFile(file);
+}
+
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) applyFile(file);
+}
+
+function applyFile(file) {
+  referenceFile = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    referenceDataUrl = e.target.result;
+    const preview = document.getElementById('dz-preview');
+    preview.src = referenceDataUrl;
+    preview.style.display = 'block';
+    document.getElementById('dz-placeholder').style.display = 'none';
+    document.getElementById('dropzone').classList.add('has-image');
+    // Prevent file input from re-triggering on click
+    document.getElementById('dropzone').onclick = null;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImage(e) {
+  e.stopPropagation();
+  referenceFile = null;
+  referenceDataUrl = null;
+  const dz = document.getElementById('dropzone');
+  dz.classList.remove('has-image');
+  document.getElementById('dz-preview').style.display = 'none';
+  document.getElementById('dz-placeholder').style.display = 'block';
+  document.getElementById('file-input').value = '';
+  dz.onclick = () => document.getElementById('file-input').click();
+}
+
+/* ────────────────────────────────────────────
+   API Keys
+──────────────────────────────────────────── */
+function saveKeys() {
+  localStorage.setItem('nbrz_key_openai', document.getElementById('key-openai').value.trim());
+  localStorage.setItem('nbrz_key_gemini', document.getElementById('key-gemini').value.trim());
+}
+
+function loadKeys() {
+  const o = localStorage.getItem('nbrz_key_openai') || '';
+  const g = localStorage.getItem('nbrz_key_gemini') || '';
+  document.getElementById('key-openai').value = o;
+  document.getElementById('key-gemini').value = g;
+}
+
+function toggleKey(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+/* ────────────────────────────────────────────
+   Modal
+──────────────────────────────────────────── */
+function openModal() { document.getElementById('settings-modal').classList.add('open'); }
+function closeModal() { document.getElementById('settings-modal').classList.remove('open'); }
+function closeModalOnBackdrop(e) { if (e.target === e.currentTarget) closeModal(); }
+
+/* ────────────────────────────────────────────
+   Lightbox
+──────────────────────────────────────────── */
+function openLightbox(src, isVideo) {
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightbox-img');
+  const vid = document.getElementById('lightbox-vid');
+  if (isVideo) {
+    img.style.display = 'none';
+    vid.style.display = 'block';
+    vid.src = src;
+  } else {
+    vid.style.display = 'none';
+    img.style.display = 'block';
+    img.src = src;
+  }
+  lb.classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightbox-vid').pause?.();
+}
+
+/* ────────────────────────────────────────────
+   Toast
+──────────────────────────────────────────── */
+function toast(msg, type = '') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast' + (type ? ' ' + type : '');
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+/* ────────────────────────────────────────────
+   Gallery helpers
+──────────────────────────────────────────── */
+function showGallery() {
+  document.getElementById('gallery-empty').style.display = 'none';
+  document.getElementById('gallery-grid').style.display = 'block';
+}
+
+function addSkeleton(count, aspectRatio) {
+  const grid = document.getElementById('gallery-grid');
+  const skeletons = [];
+  const [w, h] = aspectRatio.split(':').map(Number);
+  const pct = (h / w * 100).toFixed(1);
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'skeleton-card';
+    el.innerHTML = `<div class="skeleton" style="padding-top:${pct}%"></div>`;
+    grid.prepend(el);
+    skeletons.push(el);
+  }
+  return skeletons;
+}
+
+function replaceSkeletonWithImage(skeleton, src, label) {
+  const item = document.createElement('div');
+  item.className = 'gallery-item';
+  item.innerHTML = `
+    <img src="${src}" alt="Generated" loading="lazy" />
+    <div class="item-meta">${label}</div>
+    <div class="item-overlay">
+      <a class="item-action" href="${src}" download="nbrz-gen.png">⬇ Save</a>
+      <button class="item-action" onclick="openLightbox('${src}', false)">⛶ View</button>
+    </div>
+  `;
+  skeleton.replaceWith(item);
+}
+
+function replaceSkeletonWithVideo(skeleton, src, label) {
+  const item = document.createElement('div');
+  item.className = 'gallery-item';
+  item.innerHTML = `
+    <video src="${src}" autoplay muted loop playsinline></video>
+    <div class="item-meta">${label}</div>
+    <div class="item-overlay">
+      <a class="item-action" href="${src}" download="nbrz-gen.mp4">⬇ Save</a>
+      <button class="item-action" onclick="openLightbox('${src}', true)">⛶ View</button>
+    </div>
+  `;
+  skeleton.replaceWith(item);
+}
+
+function replaceSkeletonWithError(skeleton, msg) {
+  const item = document.createElement('div');
+  item.className = 'gallery-item';
+  item.innerHTML = `<div class="item-error">⚠ ${escapeHtml(msg)}</div>`;
+  skeleton.replaceWith(item);
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ────────────────────────────────────────────
+   Generate
+──────────────────────────────────────────── */
+async function generate() {
+  if (isGenerating) return;
+
+  const prompt = document.getElementById('prompt').value.trim();
+  if (!prompt) { toast('Please enter a prompt', 'error'); return; }
+
+  const model = document.getElementById('model-select').value;
+
+  if (currentMode === 'image') {
+    const count = parseInt(document.getElementById('count').value, 10);
+    const aspectRatio = document.getElementById('aspect-ratio').value;
+    await generateImages({ prompt, model, count, aspectRatio });
+  } else {
+    await generateVideo({ prompt, model });
+  }
+}
+
+function setGenerating(val) {
+  isGenerating = val;
+  const btn = document.getElementById('generate-btn');
+  btn.disabled = val;
+  btn.classList.toggle('loading', val);
+}
+
+/* ─── Image generation ─────────────── */
+async function generateImages({ prompt, model, count, aspectRatio }) {
+  setGenerating(true);
+  showGallery();
+
+  const skeletons = addSkeleton(count, aspectRatio);
+
+  try {
+    let results = [];
+
+    if (model.startsWith('openai')) {
+      results = await callOpenAI({ prompt, model, count, aspectRatio });
+    } else if (model.startsWith('gemini')) {
+      results = await callGemini({ prompt, model, count, aspectRatio });
+    } else {
+      throw new Error('Unknown model');
+    }
+
+    skeletons.forEach((sk, i) => {
+      if (results[i]?.error) {
+        replaceSkeletonWithError(sk, results[i].error);
+      } else if (results[i]?.url) {
+        replaceSkeletonWithImage(sk, results[i].url, model.toUpperCase().replace('-', ' '));
+      } else {
+        replaceSkeletonWithError(sk, 'No image returned');
+      }
+    });
+
+  } catch (err) {
+    skeletons.forEach(sk => replaceSkeletonWithError(sk, err.message));
+    toast('Generation failed: ' + err.message, 'error');
+  } finally {
+    setGenerating(false);
+  }
+}
+
+/* ─── Video generation ─────────────── */
+async function generateVideo({ prompt, model }) {
+  setGenerating(true);
+  showGallery();
+
+  const aspectRatio = document.getElementById('video-aspect').value;
+  const skeletons = addSkeleton(1, aspectRatio);
+
+  try {
+    if (model.startsWith('meta') || model.startsWith('google')) {
+      throw new Error('Meta AI and Google Veo video APIs are not yet publicly available. Check back when they launch or enter your beta API key in Settings.');
+    }
+    throw new Error('Unknown video model');
+  } catch (err) {
+    skeletons.forEach(sk => replaceSkeletonWithError(sk, err.message));
+    toast(err.message, 'error');
+  } finally {
+    setGenerating(false);
+  }
+}
+
+/* ────────────────────────────────────────────
+   OpenAI API
+──────────────────────────────────────────── */
+async function callOpenAI({ prompt, model, count, aspectRatio }) {
+  const apiKey = localStorage.getItem('nbrz_key_openai') || '';
+  if (!apiKey) {
+    openModal();
+    throw new Error('OpenAI API key required — click ⚙ to add it');
+  }
+
+  const sizeMap = {
+    '1:1':  '1024x1024',
+    '16:9': '1792x1024',
+    '9:16': '1024x1792',
+    '4:3':  '1024x1024',
+    '3:2':  '1792x1024',
+    '2:3':  '1024x1792',
+  };
+  const size = sizeMap[aspectRatio] || '1024x1024';
+
+  const style = document.getElementById('style').value || undefined;
+  const quality = document.getElementById('quality').value || 'standard';
+
+  // GPT-4o native image generation
+  if (model === 'openai-gpt4o') {
+    const messages = [];
+
+    if (referenceDataUrl) {
+      messages.push({
+        role: 'user',
+        content: [
+          { type: 'text', text: prompt },
+          { type: 'image_url', image_url: { url: referenceDataUrl } }
+        ]
+      });
+    } else {
+      messages.push({ role: 'user', content: prompt });
+    }
+
+    const body = {
+      model: 'gpt-image-1',
+      prompt,
+      n: count,
+      size,
+      quality: quality === 'hd' ? 'high' : 'low',
+      output_format: 'url',
+    };
+
+    const resp = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error?.message || 'OpenAI request failed');
+
+    return (data.data || []).map(item => ({
+      url: item.url || (item.b64_json ? `data:image/png;base64,${item.b64_json}` : null)
+    }));
+  }
+
+  // DALL-E 3
+  if (model === 'openai-dalle3') {
+    const body = {
+      model: 'dall-e-3',
+      prompt,
+      n: Math.min(count, 1),
+      size,
+      quality: quality === 'hd' ? 'hd' : 'standard',
+      style: style === 'vivid' ? 'vivid' : style === 'natural' ? 'natural' : undefined,
+    };
+
+    const resp = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error?.message || 'OpenAI request failed');
+
+    return (data.data || []).map(item => ({ url: item.url }));
+  }
+
+  throw new Error('Unknown OpenAI model');
+}
+
+/* ────────────────────────────────────────────
+   Gemini / Imagen API
+──────────────────────────────────────────── */
+async function callGemini({ prompt, model, count, aspectRatio }) {
+  const apiKey = localStorage.getItem('nbrz_key_gemini') || '';
+  if (!apiKey) {
+    openModal();
+    throw new Error('Google AI API key required — click ⚙ to add it');
+  }
+
+  const aspectMap = {
+    '1:1':  'IMAGE_ASPECT_RATIO_SQUARE',
+    '16:9': 'IMAGE_ASPECT_RATIO_LANDSCAPE',
+    '9:16': 'IMAGE_ASPECT_RATIO_PORTRAIT',
+    '4:3':  'IMAGE_ASPECT_RATIO_LANDSCAPE',
+    '3:2':  'IMAGE_ASPECT_RATIO_LANDSCAPE',
+    '2:3':  'IMAGE_ASPECT_RATIO_PORTRAIT',
+  };
+
+  // Gemini 2.0 Flash image generation
+  if (model === 'gemini-flash') {
+    const parts = [{ text: prompt }];
+
+    if (referenceDataUrl) {
+      const [meta, b64] = referenceDataUrl.split(',');
+      const mimeType = meta.match(/:(.*?);/)[1];
+      parts.push({ inline_data: { mime_type: mimeType, data: b64 } });
+    }
+
+    const body = {
+      contents: [{ role: 'user', parts }],
+      generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
+    };
+
+    const results = [];
+    for (let i = 0; i < count; i++) {
+      const resp = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        }
+      );
+
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error?.message || 'Gemini request failed');
+
+      const imagePart = data.candidates?.[0]?.content?.parts?.find(p => p.inline_data);
+      if (imagePart) {
+        const { mime_type, data: b64 } = imagePart.inline_data;
+        results.push({ url: `data:${mime_type};base64,${b64}` });
+      } else {
+        results.push({ error: 'No image in Gemini response' });
+      }
+    }
+    return results;
+  }
+
+  // Imagen 3
+  if (model === 'gemini-imagen3') {
+    const body = {
+      instances: [{ prompt }],
+      parameters: {
+        sampleCount: count,
+        aspectRatio: aspectMap[aspectRatio] || 'IMAGE_ASPECT_RATIO_SQUARE',
+      }
+    };
+
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      }
+    );
+
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error?.message || 'Imagen request failed');
+
+    return (data.predictions || []).map(p => ({
+      url: p.bytesBase64Encoded ? `data:image/png;base64,${p.bytesBase64Encoded}` : null,
+      error: p.bytesBase64Encoded ? undefined : 'No image data'
+    }));
+  }
+
+  throw new Error('Unknown Gemini model');
+}
+</script>
+</body>
+</html>
