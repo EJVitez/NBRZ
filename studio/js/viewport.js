@@ -131,13 +131,13 @@ export class Viewport extends EventTarget {
       this.helpers.set(o, h);
       this.scene.add(h);
     });
-    if (next.length && this.mode !== 'sculpt' && !this.renderer.xr.isPresenting) this.gizmo.attach(next[0]); else this.gizmo.detach();
+    if (next.length && this.mode !== 'sculpt' && this.mode !== 'perform' && !this.renderer.xr.isPresenting) this.gizmo.attach(next[0]); else this.gizmo.detach();
     this.dispatchEvent(new Event('selection'));
   }
 
   setMode(mode) {
     this.mode = mode;
-    if (mode === 'sculpt' || this.renderer.xr.isPresenting) this.gizmo.detach();
+    if (mode === 'sculpt' || mode === 'perform' || this.renderer.xr.isPresenting) this.gizmo.detach();
     else if (this.selection[0]) this.gizmo.attach(this.selection[0]);
   }
 
@@ -158,7 +158,7 @@ export class Viewport extends EventTarget {
     let down = null;
     el.addEventListener('pointerdown', (e) => { down = { x: e.clientX, y: e.clientY }; });
     el.addEventListener('pointerup', (e) => {
-      if (!down || this.gizmo.dragging || this.mode === 'sculpt') return;
+      if (!down || this.gizmo.dragging || this.mode === 'sculpt' || this.mode === 'perform') return;
       const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
       down = null;
       if (moved > 4 || e.button !== 0) return;

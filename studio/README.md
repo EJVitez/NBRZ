@@ -1,11 +1,67 @@
 # NBRZ Forge
 
-3D modeling and music production in one space. It runs in a desktop browser and
-in the **Meta Quest 3** browser (VR or passthrough mixed reality), from the same
-URL, with nothing to install.
+3D modeling and music production in one space, played with your body. One codebase,
+three experiences:
 
-Live at `/studio/` on the NBRZ site (e.g. `https://nbrz.netlify.app/studio/`).
-On Quest 3: open that URL in the Meta Quest Browser, tap **Enter VR** or **Passthrough**.
+| Where | What's unique there |
+|---|---|
+| **Meta Quest 3** (VR or passthrough) | A 360° stage around your body: drum ring, light harp, two-hand air synth, gesture FX, nod-to-tempo |
+| **Web (desktop)** | Full 3D modeling + studio, the stage from the inside, and the **Motion Stage** — your webcam turns your movement into music |
+| **Phone** — [`/studio/pocket/`](pocket/) | **NBRZ Pocket**: multi-finger flow synth, tilt to sweep the mix, shake for fills, bar-locked looper, record & share |
+
+Live at `/studio/` on the NBRZ site. On Quest 3, open it in the Meta Quest Browser and tap
+**Enter VR** or **Passthrough**. To keep it on your headset or phone like an app, use the browser
+menu → **Install app** / **Add to Home screen**. After the first visit it also works offline.
+
+## Go live on Cloudflare (permanent link)
+
+Pick **one** of these. Both give you a permanent `https://<project>.pages.dev` URL that updates on every push,
+plus a preview URL for every branch.
+
+**A. Dashboard (2 minutes, no secrets)** — recommended
+1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
+2. Pick `EJVitez/NBRZ`, production branch `main`
+3. Framework preset **None**, build command *empty*, build output directory `/`
+4. Save and deploy. Forge is at `https://<project>.pages.dev/studio/`, Pocket at `/studio/pocket/`
+5. Optional: **Custom domains** → add e.g. `forge.yourdomain.com`
+
+**B. GitHub Actions** (`.github/workflows/cloudflare-pages.yml`, already in the repo)
+1. Create an API token with **Cloudflare Pages: Edit**, copy your **Account ID**
+2. GitHub repo → Settings → Secrets and variables → Actions → add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
+3. Push. `main` deploys to production (project `nbrz`), other branches get previews.
+   Until the secrets exist, the workflow skips the deploy instead of failing.
+
+Headers (camera, microphone, motion sensors and WebXR allowed for this site only) live in `/_headers`,
+which Cloudflare Pages and Netlify both read. WebXR, camera and mic all need HTTPS, which both provide.
+
+## Perform — the 360° stage
+
+Instruments surround you. Turn around to reach them.
+
+| Instrument | In the headset | On desktop |
+|---|---|---|
+| **Drum ring** — 8 pads at waist height, all the way around (kick, snare, hat, open hat, 3 song chops, clap) | strike down with hands or controllers; harder = louder, with haptics | click, or keys 1–8 |
+| **Light harp** — 8 strings in front of you, always in key | sweep a hand through them | drag across, or keys Q–I |
+| **Air synth** — glowing scale rings show every note around you | hold trigger / pinch: hand height = pitch, reach = brightness, shake = vibrato; one voice per hand | hold empty space: up/down = pitch, left/right = brightness |
+| **Gesture FX** | left grip: raise/lower to sweep a filter over the whole mix · right grip: push out to throw echo | — |
+| **Nod tempo** | bob your head on the beat; after 4 steady nods the BPM follows you | — |
+| **Capture** | while the beat plays, every pad, string and air note is written into the sequencer | same |
+| **360° sky** | a particle dome that breathes with the bass (hidden in passthrough so your room shows) | same |
+
+Your 3D creations stand in front of the stage as a backdrop. Right-drag (desktop) to look around.
+
+### Motion Stage (webcam)
+In Perform mode on desktop, **Start camera**: the picture is split into 12 zones; moving in the top rows
+plays notes, the bottom row plays kick / snare / hat / clap, and the more you move the brighter the mix gets.
+Processing happens on your device; video is never uploaded.
+
+## NBRZ Pocket (phone)
+- **Flow field**: every finger is a voice. Left ↔ right = notes in key, up = brighter, wiggle = vibrato
+- **Thumb pads** with haptics
+- **Tilt + shake**: tilt forward/back sweeps the filter, sideways throws echo, shake for a drum fill
+- **Loop**: records one bar of what you play (locked to the bar line) and loops it; press again to layer
+- **Rec**: records the jam, then share it straight from the phone or save it
+- Keeps the screen awake while the beat plays
 
 ## What it does
 
@@ -76,19 +132,20 @@ Shapes flash when they play, and the space pulses with the bass.
 | Ctrl+Z / Ctrl+Shift+Z | undo / redo |
 | Ctrl+S | save project file |
 | Space | play / stop |
-| 1–8, Q–I | song chop pads |
+| 1–8, Q–I | song chop pads (Perform: drum ring + harp) |
 | Alt + drag (Sculpt) | orbit instead of sculpting |
 
-**Quest 3**
+**Quest 3** (controllers or bare hands — pinch works as trigger)
 | Input | Action |
 |---|---|
 | Trigger on a shape | grab and move it |
-| Trigger on the wrist menu (left hand) | add shapes, switch Build / Sculpt / Sound, play, copy, delete, undo, redo |
+| Trigger on the wrist menu (left hand) | add shapes, switch Build / Sculpt / Sound / Perform, play, capture, nod BPM, sky, copy, delete, undo, redo |
 | Grip (one hand) | move the whole workspace |
 | Grip (both hands) | scale and turn the workspace |
 | Grab a shape + other grip | resize the shape |
 | Trigger in Sculpt mode | sculpt where you point |
 | Swing through a shape in Sound mode | play it |
+| Perform mode | see the Perform table above |
 
 ## NBRZ catalog audio
 
@@ -121,7 +178,11 @@ studio/
   js/prompt.js        offline text → model / music
   js/ai.js            Claude text → model
   js/io.js            GLB / OBJ / STL / FBX in, STL / GLB / OBJ out
-  js/xr.js            Quest 3 VR + passthrough
+  js/xr.js            Quest 3 VR + passthrough, controllers + hand tracking
+  js/perform/stage.js  360° stage: drum ring, light harp, air synth, gesture FX, nod tempo, capture
+  js/perform/motion.js webcam Motion Stage
+  pocket/             NBRZ Pocket phone instrument
+  manifest.webmanifest, sw.js, icons/   installable app + offline
   js/audio/engine.js       mix bus, transport, recorder, WAV encoder
   js/audio/instruments.js  drum + synth voices, scales
   js/audio/sequencer.js    step sequencer + styles

@@ -1,0 +1,18 @@
+# Response headers — read by both Cloudflare Pages and Netlify.
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(self), microphone=(self), geolocation=(), xr-spatial-tracking=(self), accelerometer=(self), gyroscope=(self)
+
+/style.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/app.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/studio/vendor/*
+  Cache-Control: public, max-age=604800
+
+/studio/sw.js
+  Cache-Control: no-cache

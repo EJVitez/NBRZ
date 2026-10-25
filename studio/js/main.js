@@ -13,6 +13,8 @@ import { Sequencer, STYLES } from './audio/sequencer.js';
 import { Deck } from './audio/deck.js';
 import { SoundSpace } from './audio/spatial.js';
 import { NOTE_NAMES } from './audio/instruments.js';
+import { PerformStage } from './perform/stage.js';
+import { MotionStage } from './perform/motion.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
@@ -235,14 +237,33 @@ vp.addEventListener('selection', () => {
 
 // ── Modes ───────────────────────────────────────────────────
 function setMode(m) {
+  const prev = mode;
   mode = m;
   app.dataset.mode = m;
   vp.setMode(m);
   space.show(m === 'sound');
+  if (m === 'perform' && prev !== 'perform') enterPerform();
+  if (m !== 'perform' && prev === 'perform') exitPerform();
+  if ((m === 'perform') !== (prev === 'perform')) layoutWorld();
   $$('.mode').forEach((b) => b.classList.toggle('active', b.dataset.mode === m));
   $('#hud-mode').textContent = m.toUpperCase();
-  xr.drawMenu({ mode: m, play: engine.playing });
-  if (m === 'sound') engine.ensure();
+  xr.drawMenu(menuState());
+  if (m === 'sound' || m === 'perform') engine.ensure();
+}
+
+// Where the user's creations sit: on a table in VR, at the origin on desktop, and as a
+// backdrop in front of the 360° stage in Perform.
+function layoutWorld() {
+  const w = vp.world;
+  w.scale.setScalar(1);
+  w.rotation.set(0, 0, 0);
+  if (mode === 'perform') w.position.set(0, 0, -1.9);
+  else if (xr.presenting) w.position.set(0, 0.8, -0.55);
+  else w.position.set(0, 0, 0);
+}
+
+function menuState() {
+  return { mode, play: engine.playing, capture: stage.capture, nod: stage.nodTempo, sky: skyOn };
 }
 $$('.mode').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
 
@@ -479,6 +500,7 @@ window.addEventListener('keydown', (e) => {
   else if (mode === 'build' && k === 'r' && !mod) setGizmo('scale');
   else if (k === 'f') OPS.frame();
   else if (k === 'escape') vp.select([]);
+  else if (!mod && mode === 'perform' && PAD_KEYS.includes(k)) { const i = PAD_KEYS.indexOf(k); if (i < 8) stage.hitPad(i, 0.9); else stage.pluck(i - 8); }
   else if (!mod && PAD_KEYS.includes(k) && deck.buffer && !(mode === 'build' && 'wer'.includes(k))) { engine.ensure(); deck.hitPad(PAD_KEYS.indexOf(k)); }
 });
 
@@ -524,7 +546,7 @@ function togglePlay() {
 engine.addEventListener('state', () => {
   $('#btn-play').textContent = engine.playing ? '■' : '▶';
   $('#btn-play').classList.toggle('on', engine.playing);
-  xr.drawMenu({ mode, play: engine.playing });
+  xr.drawMenu(menuState());
 });
 $('#btn-play').addEventListener('click', togglePlay);
 $('#bpm').addEventListener('change', (e) => { engine.setBpm(+e.target.value); e.target.value = engine.bpm; });
@@ -614,9 +636,139 @@ vp.onFrame(() => {
   g.stroke();
 });
 
+// ── Perform: the 360° stage ────────────────────────────────
+const stage = new PerformStage(vp, engine, sequencer, deck);
+let skyOn = true;
+let savedView = null;
+
+function enterPerform() {
+  vp.select([]);
+  stage.show(true, { dome: skyOn && !xr.passthrough });
+  if (xr.presenting) { xr.recenterStage(); return; }
+  const { camera, orbit } = vp;
+  savedView = { pos: camera.position.clone(), target: orbit.target.clone(), rotateSpeed: orbit.rotateSpeed, zoom: orbit.enableZoom, pan: orbit.enablePan, minDistance: orbit.minDistance, fov: camera.fov,
+    mouse: { ...orbit.mouseButtons }, touches: { ...orbit.touches } };
+  stage.placeAt(new THREE.Vector3(), 0);
+  // Stand in the middle of the stage and look around (right-drag / two fingers).
+  camera.position.set(0, 1.5, 0.001);
+  orbit.target.set(0, 1.5, 0);
+  camera.lookAt(0, 1.2, -1);
+  orbit.enableZoom = false;
+  orbit.enablePan = false;
+  orbit.minDistance = 0;
+  camera.fov = 75; // wide, like standing inside the stage
+  camera.updateProjectionMatrix();
+  orbit.rotateSpeed = -0.35;
+  orbit.mouseButtons = { LEFT: null, MIDDLE: null, RIGHT: THREE.MOUSE.ROTATE };
+  orbit.touches = { ONE: null, TWO: THREE.TOUCH.ROTATE };
+  // Tilt the view down a little so the drum ring is visible.
+  const look = new THREE.Vector3(0, -0.6, -1).normalize().multiplyScalar(0.001);
+  camera.position.copy(orbit.target).sub(look);
+}
+
+function exitPerform() {
+  stage.show(false);
+  if (motion.running) toggleCamera();
+  if (!savedView) return;
+  const { camera, orbit } = vp;
+  camera.position.copy(savedView.pos);
+  camera.fov = savedView.fov;
+  camera.updateProjectionMatrix();
+  orbit.target.copy(savedView.target);
+  Object.assign(orbit, { rotateSpeed: savedView.rotateSpeed, enableZoom: savedView.zoom, enablePan: savedView.pan, minDistance: savedView.minDistance, mouseButtons: savedView.mouse, touches: savedView.touches });
+  savedView = null;
+}
+
+// Desktop / touch playing: pads, harp strokes, and an air synth on empty space.
+{
+  const AIR_LOW = 0.8, AIR_HIGH = 1.9;
+  const gestures = new Map();
+  const rayAt = (e) => {
+    const r = vp.renderer.domElement.getBoundingClientRect();
+    vp.pointer.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    vp.raycaster.setFromCamera(vp.pointer, vp.camera);
+    return r;
+  };
+  const airParams = (e, r) => ({ y: AIR_HIGH - ((e.clientY - r.top) / r.height) * (AIR_HIGH - AIR_LOW), bright: (e.clientX - r.left) / r.width });
+  vp.container.addEventListener('pointerdown', (e) => {
+    if (mode !== 'perform' || xr.presenting || e.target !== vp.renderer.domElement || e.button !== 0) return;
+    engine.ensure();
+    const r = rayAt(e);
+    const pad = stage.pickPad(vp.raycaster);
+    if (pad >= 0) { stage.hitPad(pad, 0.9); return; }
+    const string = stage.pickString(vp.raycaster);
+    vp.renderer.domElement.setPointerCapture(e.pointerId);
+    if (string >= 0) { stage.pluck(string); gestures.set(e.pointerId, { type: 'harp', last: string }); return; }
+    const key = `ptr${e.pointerId}`;
+    const { y, bright } = airParams(e, r);
+    stage.airStart(key, y);
+    stage.airMove(key, y, bright);
+    gestures.set(e.pointerId, { type: 'air', key });
+  }, { capture: true });
+  vp.renderer.domElement.addEventListener('pointermove', (e) => {
+    const g = gestures.get(e.pointerId);
+    if (!g) return;
+    const r = rayAt(e);
+    if (g.type === 'harp') {
+      const s = stage.pickString(vp.raycaster);
+      if (s >= 0 && s !== g.last) stage.pluck(s);
+      if (s >= 0) g.last = s;
+    } else {
+      const { y, bright } = airParams(e, r);
+      stage.airMove(g.key, y, bright, 0.15);
+    }
+  });
+  const end = (e) => {
+    const g = gestures.get(e.pointerId);
+    if (g?.type === 'air') stage.airEnd(g.key);
+    gestures.delete(e.pointerId);
+  };
+  vp.renderer.domElement.addEventListener('pointerup', end);
+  vp.renderer.domElement.addEventListener('pointercancel', end);
+}
+
+stage.addEventListener('tempo', (e) => {
+  engine.setBpm(e.detail);
+  $('#bpm').value = engine.bpm;
+  toast(`Tempo from your nod: ${engine.bpm} BPM`);
+});
+function setCapture(on) { stage.capture = on; $('#capture-toggle').checked = on; if (on) toast(engine.playing ? 'Capturing — what you play is written into the sequencer' : 'Capture armed — press play, then perform'); xr.drawMenu(menuState()); }
+function setNod(on) { stage.nodTempo = on; $('#nod-toggle').checked = on; xr.drawMenu(menuState()); }
+function setSky(on) { skyOn = on; $('#sky-toggle').checked = on; stage.dome.visible = on && !xr.passthrough; xr.drawMenu(menuState()); }
+$('#capture-toggle').addEventListener('change', (e) => setCapture(e.target.checked));
+$('#nod-toggle').addEventListener('change', (e) => setNod(e.target.checked));
+$('#sky-toggle').addEventListener('change', (e) => setSky(e.target.checked));
+
+// Motion stage (webcam)
+const motion = new MotionStage(engine, sequencer, { video: $('#motion-video'), overlay: $('#motion-overlay') });
+motion.addEventListener('hit', (e) => stage.captureEvent(e.detail.drum ? { drum: e.detail.drum } : { note: e.detail.degree }));
+async function toggleCamera() {
+  const btn = $('#btn-camera');
+  if (motion.running) {
+    motion.stop();
+    $('#motion-panel').hidden = true;
+    btn.textContent = 'Start camera';
+    return;
+  }
+  try {
+    $('#motion-panel').hidden = false;
+    await motion.start();
+    btn.textContent = 'Stop camera';
+    toast('Move in a zone to play it — wave high for notes, low for drums');
+  } catch (err) {
+    $('#motion-panel').hidden = true;
+    toast(`Camera unavailable: ${err.message}`, true);
+  }
+}
+$('#btn-camera').addEventListener('click', toggleCamera);
+$('#motion-sens').addEventListener('input', (e) => { motion.sensitivity = +e.target.value; });
+$('#motion-fx').addEventListener('change', (e) => { motion.bodyFx = e.target.checked; if (!e.target.checked) engine.graph?.setFx({ brightness: 1 }); });
+
 // ── VR / mixed reality ─────────────────────────────────────
 const xr = new XRRig(vp, {
   message: (m) => toast(m, true),
+  stage,
+  layout: () => layoutWorld(),
   getMode: () => mode,
   sculptor,
   spawn: (kind, pos) => spawn(kind, pos),
@@ -627,6 +779,9 @@ const xr = new XRRig(vp, {
     else if (action === 'play') togglePlay();
     else if (action === 'undo') history.undo();
     else if (action === 'redo') history.redo();
+    else if (action === 'capture') setCapture(!stage.capture);
+    else if (action === 'nod') setNod(!stage.nodTempo);
+    else if (action === 'sky') setSky(!skyOn);
     else OPS[action]?.();
   },
 });
@@ -656,4 +811,4 @@ if (!content.children.length) await starterScene();
 history.reset();
 refreshUI();
 // Expose for debugging in the console.
-window.forge = { vp, history, engine, sequencer, deck, space, xr, OPS, buildScene, parsePrompt, makeMaterial };
+window.forge = { vp, history, engine, sequencer, deck, space, stage, motion, xr, OPS, setMode, buildScene, parsePrompt, makeMaterial };

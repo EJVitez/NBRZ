@@ -6,6 +6,9 @@
   <title>NBRZ Forge — 3D + Music Studio</title>
   <meta name="description" content="NBRZ Forge: build 3D models and make music in the same space — in your browser or in VR on Meta Quest 3." />
   <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -32,6 +35,7 @@
         <button class="mode active" data-mode="build" role="tab" title="Build: place and shape objects">Build</button>
         <button class="mode" data-mode="sculpt" role="tab" title="Sculpt: push and pull surfaces with a brush">Sculpt</button>
         <button class="mode" data-mode="sound" role="tab" title="Sound: turn shapes into instruments">Sound</button>
+        <button class="mode" data-mode="perform" role="tab" title="Perform: a 360° stage you play with your body">Perform</button>
       </nav>
 
       <form class="prompt" id="prompt-form" autocomplete="off">
@@ -45,6 +49,7 @@
       <div class="top-actions">
         <button class="icon-btn" id="btn-undo" title="Undo (Ctrl+Z)">↶</button>
         <button class="icon-btn" id="btn-redo" title="Redo (Ctrl+Shift+Z)">↷</button>
+        <a class="btn" href="pocket/" title="NBRZ Pocket: the phone instrument">Pocket</a>
         <button class="btn" id="btn-import" title="Import GLB / GLTF / OBJ / STL / FBX">Import</button>
         <div class="dropdown">
           <button class="btn" id="btn-export">Export ▾</button>
@@ -124,6 +129,28 @@
         <button class="btn wide" id="btn-orbit-demo">Drop a starter beat</button>
         <label class="row"><input type="checkbox" id="reactive-toggle" checked /> Shapes pulse to the music</label>
       </section>
+
+      <section class="perform-only">
+        <h3>360° stage</h3>
+        <p class="hint">Instruments surround you. In the headset you play them with your body; here, right-drag to look around.</p>
+        <ul class="legend">
+          <li><b>Drum ring</b> click / strike the 8 pads around you</li>
+          <li><b>Light harp</b> drag across the strings</li>
+          <li><b>Air synth</b> hold anywhere else: up/down = pitch, left/right = brightness</li>
+          <li><b>VR grips</b> left = filter sweep, right = echo throw</li>
+        </ul>
+        <label class="row"><input type="checkbox" id="capture-toggle" /> Capture to sequencer</label>
+        <label class="row"><input type="checkbox" id="nod-toggle" /> Nod your head to set BPM (VR)</label>
+        <label class="row"><input type="checkbox" id="sky-toggle" checked /> 360° sky</label>
+      </section>
+
+      <section class="perform-only">
+        <h3>Motion stage</h3>
+        <p class="hint">Your camera becomes an instrument: move in a zone to play it. Top rows = notes, bottom row = drums. Video never leaves your device.</p>
+        <button class="btn wide" id="btn-camera">Start camera</button>
+        <label class="slider">Sensitivity <input type="range" id="motion-sens" min="0" max="1" step="0.05" value="0.5" /></label>
+        <label class="row"><input type="checkbox" id="motion-fx" checked /> Moving more opens the filter</label>
+      </section>
     </aside>
 
     <!-- ── VIEWPORT ────────────────────────────────────────── -->
@@ -135,6 +162,11 @@
       </div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
       <div class="drop-hint" id="drop-hint">Drop a 3D model or audio file</div>
+      <div class="motion-panel" id="motion-panel" hidden>
+        <video id="motion-video" playsinline muted></video>
+        <canvas id="motion-overlay"></canvas>
+      </div>
+      <div class="perform-hint" id="perform-hint">Click pads · drag across the harp · hold empty space for the air synth · right-drag to look around</div>
     </main>
 
     <!-- ── RIGHT PANEL ─────────────────────────────────────── -->
@@ -277,5 +309,8 @@
   <input type="file" id="file-audio" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac" hidden />
 
   <script type="module" src="js/main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+  </script>
 </body>
 </html>

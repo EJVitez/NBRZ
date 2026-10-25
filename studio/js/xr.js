@@ -1,10 +1,16 @@
-// Meta Quest 3 / WebXR: VR and passthrough mixed reality.
+// Meta Quest 3 / WebXR: VR and passthrough mixed reality, with controllers or bare hands.
 //
-// Right or left trigger   point + pull to grab shapes, press wrist-menu buttons, sculpt
-// Grip (one hand)          grab and move the whole workspace
-// Grip (both hands)        scale + turn the workspace
-// Grab a shape + other grip  resize that shape
-// Sound mode               hit shapes with your controllers to play them like pads
+// Build / Sculpt / Sound
+//   Trigger (or pinch)        grab shapes, press wrist-menu buttons, sculpt where you point
+//   Grip (one hand)           move the whole workspace
+//   Grip (both hands)         scale + turn the workspace
+//   Grab a shape + other grip resize that shape
+//   Sound mode                hit shapes with your hands to play them
+// Perform (360° stage around your body — see perform/stage.js)
+//   Hands / fingertips        strike the drum ring, sweep through the light harp
+//   Trigger (or pinch) held   air synth: hand height = pitch, reach = brightness
+//   Left grip                 raise / lower to sweep a filter over the whole mix
+//   Right grip                push your hand out to throw echo
 import * as THREE from 'three';
 import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
@@ -12,9 +18,11 @@ import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
 const MENU = [
   ['Cube', 'spawn:cube'], ['Sphere', 'spawn:sphere'], ['Cylinder', 'spawn:cylinder'], ['Cone', 'spawn:cone'],
   ['Torus', 'spawn:torus'], ['Gem', 'spawn:gem'], ['Pyramid', 'spawn:pyramid'], ['Text', 'spawn:text'],
-  ['BUILD', 'mode:build'], ['SCULPT', 'mode:sculpt'], ['SOUND', 'mode:sound'], ['▶ / ■', 'play'],
+  ['BUILD', 'mode:build'], ['SCULPT', 'mode:sculpt'], ['SOUND', 'mode:sound'], ['PERFORM', 'mode:perform'],
+  ['▶ / ■', 'play'], ['CAPTURE', 'capture'], ['NOD BPM', 'nod'], ['SKY', 'sky'],
   ['Copy', 'duplicate'], ['Delete', 'delete'], ['Undo', 'undo'], ['Redo', 'redo'],
 ];
+const COLS = 4, ROWS = MENU.length / COLS, CELL = 128;
 
 export class XRRig {
   constructor(viewport, actions) {
@@ -24,12 +32,20 @@ export class XRRig {
     this.hands = [];
     this.raycaster = new THREE.Raycaster();
     this.tmpMat = new THREE.Matrix4();
+    this.clock = 0;
     this.#setupControllers();
     this.#buildMenu();
     this.renderer.xr.addEventListener('sessionstart', () => this.#onStart());
     this.renderer.xr.addEventListener('sessionend', () => this.#onEnd());
     viewport.onFrame((dt) => this.#frame(dt));
+    actions.stage.addEventListener('haptic', (e) => {
+      const h = this.hands.find((x) => this.#key(x) === e.detail.key);
+      if (h) this.pulse(h, e.detail.strength, 25);
+    });
   }
+
+  get presenting() { return this.renderer.xr.isPresenting; }
+  get passthrough() { return this.presenting && this.mode === 'immersive-ar'; }
 
   async addButtons(slot) {
     if (!navigator.xr) return;
@@ -43,42 +59,45 @@ export class XRRig {
       b.addEventListener('click', () => this.enter(mode).catch((e) => this.actions.message?.(`Couldn’t start XR: ${e.message}`)));
       slot.append(b);
     };
-    await make('immersive-vr', 'Enter VR', 'Open the workspace in your headset');
-    await make('immersive-ar', 'Passthrough', 'Mixed reality: build on your real desk (Quest 3)');
+    await make('immersive-vr', 'Enter VR', 'Step into the 360° studio in your headset');
+    await make('immersive-ar', 'Passthrough', 'Mixed reality: the studio in your real room (Quest 3)');
   }
 
   async enter(mode) {
-    if (this.renderer.xr.isPresenting) return;
+    if (this.presenting) return;
     this.mode = mode;
     const session = await navigator.xr.requestSession(mode, { optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking', 'layers'] });
     this.renderer.xr.setReferenceSpaceType('local-floor');
     await this.renderer.xr.setSession(session);
   }
 
+  // Ask for the Perform stage to be re-centred on the player on the next frame.
+  recenterStage() { this.needPlace = true; }
+
   #onStart() {
-    const { world, scene } = this.vp;
-    this.saved = { pos: world.position.clone(), scale: world.scale.clone(), rot: world.quaternion.clone(), bg: scene.background, fog: scene.fog };
-    // Put the workspace on a virtual table in front of you.
-    world.position.set(0, 0.8, -0.55);
-    world.scale.setScalar(1);
-    world.quaternion.identity();
+    const { scene } = this.vp;
+    this.saved = { bg: scene.background, fog: scene.fog };
     if (this.mode === 'immersive-ar') { scene.background = null; scene.fog = null; this.vp.floor.material.opacity = 0.2; }
     this.vp.gizmo.detach();
     this.menu.visible = true;
+    this.actions.layout();
+    this.needPlace = true;
   }
 
   #onEnd() {
-    const { world, scene } = this.vp;
-    world.position.copy(this.saved.pos);
-    world.scale.copy(this.saved.scale);
-    world.quaternion.copy(this.saved.rot);
+    const { scene } = this.vp;
     scene.background = this.saved.bg;
     scene.fog = this.saved.fog;
     this.vp.floor.material.opacity = 0.35;
     this.menu.visible = false;
+    this.hands.forEach((h) => { if (h.air) this.actions.stage.airEnd(this.#key(h)); h.air = h.fx = false; });
+    this.actions.stage.resetFx();
+    this.actions.layout();
     this.vp.resize();
     this.vp.select(this.vp.selection);
   }
+
+  #key(h) { return h.handedness || `hand${h.i}`; }
 
   #setupControllers() {
     const xr = this.renderer.xr;
@@ -95,52 +114,67 @@ export class XRRig {
       const hand = xr.getHand(i);
       hand.add(handFactory.createHandModel(hand, 'mesh'));
       const h = { i, ctrl, grip, line, hand, grabbed: null, squeezing: false, lastPos: new THREE.Vector3(), vel: new THREE.Vector3(), inside: new Set() };
-      ctrl.addEventListener('connected', (e) => { h.handedness = e.data.handedness; h.gamepad = e.data.gamepad; if (h.handedness === 'left') this.#attachMenu(h); });
+      ctrl.addEventListener('connected', (e) => {
+        h.handedness = e.data.handedness;
+        h.gamepad = e.data.gamepad;
+        h.isHand = !!e.data.hand;
+        if (h.handedness === 'left') this.#attachMenu(h);
+      });
       ctrl.addEventListener('selectstart', () => this.#selectStart(h));
       ctrl.addEventListener('selectend', () => this.#selectEnd(h));
-      ctrl.addEventListener('squeezestart', () => { h.squeezing = true; this.#squeezeChanged(); });
-      ctrl.addEventListener('squeezeend', () => { h.squeezing = false; this.#squeezeChanged(); });
+      ctrl.addEventListener('squeezestart', () => { h.squeezing = true; this.#squeezeChanged(h); });
+      ctrl.addEventListener('squeezeend', () => { h.squeezing = false; this.#squeezeChanged(h); });
       this.vp.scene.add(ctrl, grip, hand);
       this.hands.push(h);
     }
   }
 
-  // ── Wrist menu (canvas texture on the left controller) ───────
+  // Where a hand "is": the index fingertip when hand-tracking, else the controller grip.
+  #point(h, out = new THREE.Vector3()) {
+    const tip = h.hand.joints?.['index-finger-tip'];
+    if (tip && tip.visible && h.hand.visible) return tip.getWorldPosition(out);
+    if (h.grip.visible) return h.grip.getWorldPosition(out);
+    return h.ctrl.getWorldPosition(out);
+  }
+
+  // ── Wrist menu (canvas texture on the left controller / hand) ─
   #buildMenu() {
     const canvas = document.createElement('canvas');
-    canvas.width = 512; canvas.height = 512;
+    canvas.width = COLS * CELL; canvas.height = ROWS * CELL;
     this.menuCanvas = canvas;
     this.menuTex = new THREE.CanvasTexture(canvas);
     this.menuTex.colorSpace = THREE.SRGBColorSpace;
-    this.menu = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.16), new THREE.MeshBasicMaterial({ map: this.menuTex, transparent: true }));
+    this.menu = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.16 * ROWS / COLS), new THREE.MeshBasicMaterial({ map: this.menuTex, transparent: true }));
     this.menu.name = 'xr-menu';
     this.menu.visible = false;
     this.drawMenu();
   }
 
-  drawMenu(active = {}) {
+  drawMenu(active = this.menuState || {}) {
     const g = this.menuCanvas.getContext('2d');
-    g.clearRect(0, 0, 512, 512);
+    const W = this.menuCanvas.width, H = this.menuCanvas.height;
+    g.clearRect(0, 0, W, H);
     g.fillStyle = 'rgba(5,7,8,0.92)';
-    g.beginPath(); g.roundRect(0, 0, 512, 512, 28); g.fill();
+    g.beginPath(); g.roundRect(0, 0, W, H, 28); g.fill();
     MENU.forEach(([label, action], k) => {
-      const x = (k % 4) * 128, y = Math.floor(k / 4) * 128;
+      const x = (k % COLS) * CELL, y = Math.floor(k / COLS) * CELL;
       const on = active[action] || (action === `mode:${active.mode}`);
       g.fillStyle = on ? '#44D4E8' : this.hover === k ? '#1b3a40' : '#11171a';
-      g.beginPath(); g.roundRect(x + 6, y + 6, 116, 116, 14); g.fill();
+      g.beginPath(); g.roundRect(x + 6, y + 6, CELL - 12, CELL - 12, 14); g.fill();
       g.fillStyle = on ? '#000' : '#e8eef0';
       g.font = `bold ${label.length > 6 ? 24 : 28}px "Barlow Condensed", Arial, sans-serif`;
       g.textAlign = 'center'; g.textBaseline = 'middle';
-      g.fillText(label, x + 64, y + 64);
+      g.fillText(label, x + CELL / 2, y + CELL / 2);
     });
     this.menuState = active;
     this.menuTex.needsUpdate = true;
   }
 
   #attachMenu(h) {
-    this.menu.position.set(0, 0.07, -0.06);
+    this.menu.position.set(0, 0.08, -0.06);
     this.menu.rotation.set(-Math.PI / 3, 0, 0);
-    h.grip.add(this.menu);
+    // Controllers carry the menu on the grip; bare hands carry it on the wrist.
+    (h.isHand && h.hand.joints?.wrist ? h.hand.joints.wrist : h.grip).add(this.menu);
   }
 
   #menuHit(h) {
@@ -148,8 +182,8 @@ export class XRRig {
     this.#ray(h);
     const hit = this.raycaster.intersectObject(this.menu)[0];
     if (!hit) return null;
-    const col = Math.min(3, Math.floor(hit.uv.x * 4)), row = Math.min(3, Math.floor((1 - hit.uv.y) * 4));
-    return row * 4 + col;
+    const col = Math.min(COLS - 1, Math.floor(hit.uv.x * COLS)), row = Math.min(ROWS - 1, Math.floor((1 - hit.uv.y) * ROWS));
+    return row * COLS + col;
   }
 
   #ray(h) {
@@ -168,7 +202,7 @@ export class XRRig {
     return { object: o, hit: hits[0] };
   }
 
-  // ── Trigger ──────────────────────────────────────────────────
+  // ── Trigger / pinch ─────────────────────────────────────────
   #selectStart(h) {
     const k = this.#menuHit(h);
     if (k !== null) {
@@ -180,9 +214,15 @@ export class XRRig {
       this.pulse(h, 0.3, 30);
       return;
     }
+    const mode = this.actions.getMode();
+    if (mode === 'perform') {
+      h.air = true;
+      const local = this.actions.stage.group.worldToLocal(this.#point(h));
+      this.actions.stage.airStart(this.#key(h), local.y);
+      return;
+    }
     const res = this.#pickContent(h);
     if (!res) { this.vp.select([]); return; }
-    const mode = this.actions.getMode();
     this.vp.select(res.object); // in Sound mode, selecting also plays the shape
     if (mode === 'sculpt' && res.object.isMesh) {
       h.sculpting = res.object;
@@ -195,6 +235,10 @@ export class XRRig {
   }
 
   #selectEnd(h) {
+    if (h.air) {
+      this.actions.stage.airEnd(this.#key(h));
+      h.air = false;
+    }
     if (h.sculpting) {
       this.actions.sculptor.end();
       h.sculpting = null;
@@ -207,8 +251,13 @@ export class XRRig {
     }
   }
 
-  // ── Grip: move / scale the workspace ─────────────────────────
-  #squeezeChanged() {
+  // ── Grip: workspace move/scale, or gesture FX in Perform ─────
+  #squeezeChanged(changed) {
+    if (this.actions.getMode() === 'perform') {
+      changed.fx = changed.squeezing;
+      if (!changed.fx) this.actions.stage.setFx(this.#key(changed) === 'left' ? { brightness: 1, resonance: 0 } : { echo: 0 });
+      return;
+    }
     const [a, b] = this.hands;
     const world = this.vp.world;
     this.worldGrab = null;
@@ -229,8 +278,19 @@ export class XRRig {
   }
 
   #frame(dt) {
-    if (!this.renderer.xr.isPresenting) return;
+    if (!this.presenting) return;
+    this.clock += dt;
     const world = this.vp.world;
+    const mode = this.actions.getMode();
+    const stage = this.actions.stage;
+    const head = this.renderer.xr.getCamera().getWorldPosition(new THREE.Vector3());
+
+    if (this.needPlace) {
+      const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(this.renderer.xr.getCamera().getWorldQuaternion(new THREE.Quaternion()));
+      stage.placeAt(head, Math.atan2(-dir.x, -dir.z));
+      this.needPlace = false;
+    }
+
     const g = this.worldGrab;
     if (g?.two) {
       const [a, b] = this.hands;
@@ -238,7 +298,6 @@ export class XRRig {
       const s = THREE.MathUtils.clamp(g.scale * (v.length() / g.dist), 0.1, 10);
       const dAngle = Math.atan2(v.x, v.z) - g.angle;
       const mid = a.grip.position.clone().add(b.grip.position).multiplyScalar(0.5);
-      // Scale and rotate around the starting midpoint, then follow the hands.
       const offset = g.pos.clone().sub(g.mid).multiplyScalar(s / g.scale).applyAxisAngle(new THREE.Vector3(0, 1, 0), dAngle);
       world.position.copy(mid).add(offset);
       world.scale.setScalar(s);
@@ -247,16 +306,26 @@ export class XRRig {
       world.position.copy(g.pos).add(g.h.grip.position.clone().sub(g.start));
     }
 
-    for (const h of this.hands) {
-      // Velocity for hits.
-      const p = h.grip.getWorldPosition(new THREE.Vector3());
-      h.vel.copy(p).sub(h.lastPos).divideScalar(Math.max(dt, 1e-3));
-      h.lastPos.copy(p);
+    if (mode === 'perform') stage.updateHead(head, dt, this.clock);
 
-      // Hover feedback on the menu.
+    for (const h of this.hands) {
+      const key = this.#key(h);
+      const p = this.#point(h);
+      h.vel.copy(p).sub(h.lastPos).divideScalar(Math.max(dt, 1e-3));
+      if (h.vel.length() > 20) h.vel.set(0, 0, 0); // tracking jump, not a real hit
+      h.lastPos.copy(p);
+      const speed = h.vel.length();
+
       if (h.handedness !== 'left') {
         const k = this.#menuHit(h);
-        if (k !== this.hover) { this.hover = k; this.drawMenu(this.menuState); }
+        if (k !== this.hover) { this.hover = k; this.drawMenu(); }
+      }
+
+      if (mode === 'perform') {
+        stage.updateHand(key, p, h.vel);
+        if (h.air) stage.airHand(key, p, head, speed);
+        if (h.fx) stage.fxHand(key, p, head);
+        continue;
       }
 
       if (h.grabbed && h.scaleStart) {
@@ -271,8 +340,7 @@ export class XRRig {
       }
 
       // Sound mode: hitting a shape plays it, harder = louder.
-      if (this.actions.getMode() === 'sound' && !h.grabbed) {
-        const speed = h.vel.length();
+      if (mode === 'sound' && !h.grabbed) {
         for (const obj of this.vp.content.children) {
           const sphere = new THREE.Box3().setFromObject(obj).getBoundingSphere(new THREE.Sphere());
           const inside = sphere.distanceToPoint(p) < 0.01;

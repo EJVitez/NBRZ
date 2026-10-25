@@ -63,6 +63,7 @@ button { cursor: pointer; }
 .top-actions { display: flex; align-items: center; gap: 6px; }
 
 .btn {
+  text-decoration: none; display: inline-block; color: var(--text);
   background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r);
   padding: 6px 11px; white-space: nowrap; transition: border-color .15s, color .15s;
 }
@@ -126,8 +127,8 @@ input[type=checkbox] { accent-color: var(--cyan); }
 .legend { list-style: none; display: grid; gap: 3px; margin: 8px 0; color: #b8c2c6; font-size: 12px; }
 .legend b { color: var(--green); font-weight: 500; }
 
-.build-only, .sculpt-only, .sound-only { display: none; }
-.app[data-mode=build] .build-only, .app[data-mode=sculpt] .sculpt-only, .app[data-mode=sound] .sound-only { display: block; }
+.build-only, .sculpt-only, .sound-only, .perform-only { display: none; }
+.app[data-mode=build] .build-only, .app[data-mode=sculpt] .sculpt-only, .app[data-mode=sound] .sound-only, .app[data-mode=perform] .perform-only { display: block; }
 
 .field { display: grid; gap: 3px; margin-bottom: 8px; color: var(--muted); font-size: 11.5px; }
 .field input, .field select, #api-key {
@@ -171,6 +172,19 @@ input[type=checkbox] { accent-color: var(--cyan); }
   background: rgba(0,0,0,.6); pointer-events: none;
 }
 .viewport.dragging .drop-hint { display: grid; }
+.motion-panel {
+  position: absolute; right: 12px; bottom: 12px; width: 280px; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--cyan); box-shadow: 0 10px 40px rgba(0,0,0,.6); background: #000;
+}
+.motion-panel video, .motion-panel canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.motion-panel video { transform: scaleX(-1); opacity: .55; }
+.perform-hint {
+  display: none; position: absolute; left: 50%; top: 12px; transform: translateX(-50%); max-width: 90%; text-align: center;
+  font-family: var(--fh); letter-spacing: .12em; font-size: 11px; text-transform: uppercase; color: var(--muted); pointer-events: none;
+}
+.app[data-mode=perform] .perform-hint { display: block; }
+.app[data-mode=perform] .hud { display: none; }
+@media (max-width: 760px) { .motion-panel { width: 160px; } }
 
 /* ── Studio drawer ─────────────────────────────────────── */
 .studio { grid-area: studio; border-top: 1px solid var(--line); background: var(--panel); }

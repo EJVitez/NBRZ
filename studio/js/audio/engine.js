@@ -18,7 +18,20 @@ export function buildGraph(ctx) {
   comp.threshold.value = -14; comp.knee.value = 8; comp.ratio.value = 3; comp.attack.value = 0.004; comp.release.value = 0.2;
   const limiter = ctx.createDynamicsCompressor();
   limiter.threshold.value = -1.5; limiter.knee.value = 0; limiter.ratio.value = 20; limiter.attack.value = 0.001; limiter.release.value = 0.08;
-  master.connect(comp).connect(limiter);
+  // Performance FX (driven by gestures): a sweepable filter on the mix and an echo "throw".
+  const fxFilter = ctx.createBiquadFilter();
+  fxFilter.type = 'lowpass'; fxFilter.frequency.value = 20000; fxFilter.Q.value = 0.8;
+  master.connect(fxFilter).connect(comp).connect(limiter);
+  const throwSend = ctx.createGain();
+  throwSend.gain.value = 0;
+  const throwDelay = ctx.createDelay(2);
+  const throwFb = ctx.createGain();
+  throwFb.gain.value = 0.55;
+  const throwTone = ctx.createBiquadFilter();
+  throwTone.type = 'bandpass'; throwTone.frequency.value = 1800; throwTone.Q.value = 0.6;
+  // Output goes straight to the limiter so it can never feed back through the master.
+  master.connect(throwSend).connect(throwDelay).connect(throwTone).connect(throwFb).connect(throwDelay);
+  throwTone.connect(limiter);
 
   const reverb = ctx.createConvolver();
   reverb.buffer = makeImpulse(ctx);
@@ -47,8 +60,15 @@ export function buildGraph(ctx) {
   return {
     ctx, master, out: limiter, reverb, delay,
     buses: { kick: bus('kick', 0.02), snare: bus('snare', 0.18), hat: bus('hat', 0.06), clap: bus('clap', 0.2),
-      synth: bus('synth', 0.25, 0.12), chop: bus('chop', 0.08), deck: bus('deck', 0.15), mic: bus('mic', 0.2) },
-    setTempo(bpm) { delay.delayTime.value = (60 / bpm) * 0.75; },
+      synth: bus('synth', 0.25, 0.12), chop: bus('chop', 0.08), deck: bus('deck', 0.15), mic: bus('mic', 0.2), air: bus('air', 0.3, 0.18) },
+    setTempo(bpm) { delay.delayTime.value = (60 / bpm) * 0.75; throwDelay.delayTime.value = (60 / bpm) * 0.5; },
+    // brightness 0..1 (1 = open), echo 0..1. Smoothed so gestures never click.
+    setFx({ brightness, echo, resonance } = {}) {
+      const t = ctx.currentTime;
+      if (brightness !== undefined) fxFilter.frequency.setTargetAtTime(90 * Math.pow(20000 / 90, Math.max(0, Math.min(1, brightness))), t, 0.03);
+      if (resonance !== undefined) fxFilter.Q.setTargetAtTime(0.8 + resonance * 10, t, 0.05);
+      if (echo !== undefined) throwSend.gain.setTargetAtTime(Math.max(0, Math.min(1, echo)) * 0.8, t, 0.05);
+    },
   };
 }
 

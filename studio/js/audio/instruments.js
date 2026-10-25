@@ -170,3 +170,57 @@ export function scaleNote(root, scale, degree, octave = 4) {
   const d = ((degree % s.length) + s.length) % s.length;
   return 12 * (octave + 1) + root + s[d] + 12 * oct;
 }
+
+// A held, continuously controllable voice for gestures (air synth, touch pads).
+export class MonoVoice {
+  constructor(ctx, out, { type = 'sawtooth', detune = 8, level = 0.22 } = {}) {
+    this.ctx = ctx;
+    this.level = level;
+    this.filter = ctx.createBiquadFilter();
+    this.filter.type = 'lowpass'; this.filter.frequency.value = 1200; this.filter.Q.value = 3;
+    this.gain = ctx.createGain();
+    this.gain.gain.value = 0;
+    this.filter.connect(this.gain).connect(out);
+    this.vibrato = ctx.createOscillator();
+    this.vibrato.frequency.value = 5.2;
+    this.vibDepth = ctx.createGain();
+    this.vibDepth.gain.value = 0;
+    this.vibrato.connect(this.vibDepth);
+    this.oscs = [-detune, detune].map((d, i) => {
+      const o = ctx.createOscillator();
+      o.type = i ? (type === 'triangle' ? 'sine' : 'square') : type;
+      o.detune.value = d;
+      this.vibDepth.connect(o.detune);
+      o.connect(this.filter);
+      o.start();
+      return o;
+    });
+    this.vibrato.start();
+    this.on = false;
+  }
+
+  set(midi, { glide = 0.06, brightness, vibrato } = {}) {
+    const t = this.ctx.currentTime;
+    const f = 440 * Math.pow(2, (midi - 69) / 12);
+    this.oscs.forEach((o) => o.frequency.setTargetAtTime(f, t, glide));
+    if (brightness !== undefined) this.filter.frequency.setTargetAtTime(150 + Math.pow(Math.max(0, Math.min(1, brightness)), 2) * 7000, t, 0.04);
+    if (vibrato !== undefined) this.vibDepth.gain.setTargetAtTime(vibrato * 40, t, 0.08);
+  }
+
+  start(vel = 1) {
+    this.on = true;
+    this.gain.gain.setTargetAtTime(this.level * vel, this.ctx.currentTime, 0.02);
+  }
+
+  setLevel(vel) { if (this.on) this.gain.gain.setTargetAtTime(this.level * vel, this.ctx.currentTime, 0.03); }
+
+  stop() {
+    this.on = false;
+    this.gain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.12);
+  }
+
+  dispose() {
+    this.stop();
+    setTimeout(() => { this.oscs.forEach((o) => o.stop()); this.vibrato.stop(); this.gain.disconnect(); }, 800);
+  }
+}
