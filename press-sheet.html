@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NBRZ — Press Sheet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ─── Root / Tokens ─────────────────────────────────────── */
+    :root {
+      --bg:          #000000;
+      --surface:     #0d0d0d;
+      --border:      rgba(255,255,255,0.08);
+      --text:        #e8e8e8;
+      --muted:       rgba(255,255,255,0.45);
+      --grad-start:  #8EF0A4;
+      --grad-mid:    #44D4E8;
+      --grad-end:    #2B9EFF;
+      --grad: linear-gradient(100deg, var(--grad-start), var(--grad-mid), var(--grad-end));
+    }
+
+    /* ─── Page ───────────────────────────────────────────────── */
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 56px 48px 72px;
+    }
+
+    /* ─── Gradient utility ───────────────────────────────────── */
+    .grad-text {
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .grad-bar {
+      height: 3px;
+      background: var(--grad);
+      border-radius: 2px;
+    }
+
+    /* ─── Header ─────────────────────────────────────────────── */
+    .header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 10px;
+    }
+
+    .wordmark {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 96px;
+      letter-spacing: -2px;
+      line-height: 1;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-meta {
+      text-align: right;
+      padding-bottom: 8px;
+    }
+
+    .header-meta .label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .header-meta .tagline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── Divider ────────────────────────────────────────────── */
+    .divider {
+      margin: 20px 0 32px;
+    }
+
+    /* ─── Two-col body ───────────────────────────────────────── */
+    .body-grid {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 40px;
+      align-items: start;
+    }
+
+    /* ─── Bio ────────────────────────────────────────────────── */
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .bio-text {
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--text);
+    }
+
+    /* ─── Right column ───────────────────────────────────────── */
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ─── Stats block ────────────────────────────────────────── */
+    .stats-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 24px 22px;
+    }
+
+    .stat-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .stat-row:first-child {
+      padding-top: 0;
+    }
+
+    .stat-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 36px;
+      line-height: 1;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      flex-shrink: 0;
+    }
+
+    .stat-desc {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    /* ─── Tracks block ───────────────────────────────────────── */
+    .tracks-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 20px 22px;
+    }
+
+    .track-list {
+      list-style: none;
+      margin-top: 10px;
+    }
+
+    .track-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text);
+    }
+
+    .track-list li:last-child {
+      border-bottom: none;
+    }
+
+    .track-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--grad);
+      background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+      flex-shrink: 0;
+    }
+
+    /* ─── Genre tags ─────────────────────────────────────────── */
+    .genres-section {
+      margin-top: 28px;
+    }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 3px;
+      border: 1px solid rgba(68, 212, 232, 0.3);
+      color: var(--grad-mid);
+    }
+
+    /* ─── Streaming links ────────────────────────────────────── */
+    .links-section {
+      margin-top: 28px;
+    }
+
+    .link-list {
+      list-style: none;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .link-list li a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text);
+      transition: color 0.2s;
+    }
+
+    .link-list li a:hover {
+      color: var(--grad-mid);
+    }
+
+    .link-platform {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      min-width: 90px;
+      color: var(--muted);
+    }
+
+    .link-url {
+      font-size: 12px;
+      color: var(--muted);
+      word-break: break-all;
+    }
+
+    .link-list li a:hover .link-platform,
+    .link-list li a:hover .link-url {
+      color: var(--grad-mid);
+    }
+
+    /* ─── Footer ─────────────────────────────────────────────── */
+    .footer {
+      margin-top: 48px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .footer-left {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .footer-right {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── Print ──────────────────────────────────────────────── */
+    @media print {
+      :root {
+        --bg:      #ffffff;
+        --surface: #f5f5f5;
+        --border:  rgba(0,0,0,0.10);
+        --text:    #111111;
+        --muted:   rgba(0,0,0,0.45);
+      }
+
+      html, body {
+        background: #ffffff;
+        color: #111111;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .page {
+        padding: 32px 40px;
+        max-width: 100%;
+      }
+
+      .wordmark {
+        font-size: 80px;
+      }
+
+      /* Keep gradient text on print */
+      .grad-text,
+      .wordmark,
+      .header-meta .tagline,
+      .stat-num,
+      .footer-right {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      a { text-decoration: none; color: inherit; }
+
+      .tag {
+        border-color: rgba(0,0,0,0.25);
+        color: #333;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- ── Header ── -->
+    <header class="header">
+      <div class="wordmark">NBRZ</div>
+      <div class="header-meta">
+        <div class="label">Press Sheet · 2025</div>
+        <div class="tagline">The Block Is the Studio.</div>
+      </div>
+    </header>
+
+    <div class="divider">
+      <div class="grad-bar"></div>
+    </div>
+
+    <!-- ── Two-column body ── -->
+    <div class="body-grid">
+
+      <!-- Left: Bio + Genres + Links -->
+      <div class="left-col">
+
+        <div class="section-label">About</div>
+        <p class="bio-text">
+          NBRZ is an underground music production collective operating entirely outside the label system. With a catalog of over 100 original tracks distributed across 20+ streaming platforms worldwide, they've built something the industry didn't hand them — pure creative independence.
+        </p>
+        <p class="bio-text" style="margin-top: 14px;">
+          The range is the point. Club anthems, cinematic atmospheres, late-night introspection, Latin grooves, and feel-good funk all share the same DNA: intention over trend. From the floor-filling energy of <em>CROWN IN THE CLUB</em> and <em>BOOM BOOM</em> to the atmospheric weight of <em>Samsara</em> and <em>Saltwater Memory</em>, every release is made on NBRZ's own terms.
+        </p>
+        <p class="bio-text" style="margin-top: 14px;">
+          No gatekeepers. No label politics. Just a collective that turned the block into the studio — and kept going.
+        </p>
+
+        <!-- Genre tags -->
+        <div class="genres-section">
+          <div class="section-label">Sounds Like</div>
+          <div class="tag-cloud">
+            <span class="tag">Club / Banger</span>
+            <span class="tag">Cinematic</span>
+            <span class="tag">Late Night</span>
+            <span class="tag">Latin / Urban</span>
+            <span class="tag">Summer Anthem</span>
+            <span class="tag">Funk</span>
+            <span class="tag">Atmospheric</span>
+            <span class="tag">Electronic</span>
+          </div>
+        </div>
+
+        <!-- Streaming links -->
+        <div class="links-section">
+          <div class="section-label">Streaming &amp; Web</div>
+          <ul class="link-list">
+            <li>
+              <a href="https://open.spotify.com/artist/2m355dx0tY1O5CQZ99Tdz9" target="_blank">
+                <span class="link-platform">Spotify</span>
+                <span class="link-url">open.spotify.com/artist/2m355dx0tY1O5CQZ99Tdz9</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://music.apple.com/us/artist/nbrz/1883404337" target="_blank">
+                <span class="link-platform">Apple Music</span>
+                <span class="link-url">music.apple.com/us/artist/nbrz/1883404337</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://nbrz.netlify.app" target="_blank">
+                <span class="link-platform">Website</span>
+                <span class="link-url">nbrz.netlify.app</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" target="_blank">
+                <span class="link-platform">Tidal</span>
+                <span class="link-url">Available on Tidal, Amazon Music &amp; 20+ platforms</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Right: Stats + Key Tracks -->
+      <div class="right-col">
+
+        <!-- Stats -->
+        <div class="stats-block">
+          <div class="section-label">By the Numbers</div>
+          <div class="stat-row">
+            <div class="stat-num">100+</div>
+            <div class="stat-desc">Original Tracks</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-num">20+</div>
+            <div class="stat-desc">Streaming Platforms</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-num">0</div>
+            <div class="stat-desc">Label Deals. Independent.</div>
+          </div>
+        </div>
+
+        <!-- Key Tracks -->
+        <div class="tracks-block">
+          <div class="section-label">Key Tracks</div>
+          <ul class="track-list">
+            <li><span class="track-dot"></span>Saltwater Memory</li>
+            <li><span class="track-dot"></span>CROWN IN THE CLUB</li>
+            <li><span class="track-dot"></span>Show Me Your TikTok</li>
+            <li><span class="track-dot"></span>Wild All Summer</li>
+            <li><span class="track-dot"></span>Construye El Tuyo</li>
+            <li><span class="track-dot"></span>Golden Era</li>
+            <li><span class="track-dot"></span>Midnight Crossfade</li>
+            <li><span class="track-dot"></span>Vertigo</li>
+            <li><span class="track-dot"></span>BOOM BOOM</li>
+            <li><span class="track-dot"></span>Samsara</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Footer ── -->
+    <footer class="footer">
+      <div class="footer-left">NBRZ · Independent · All Rights Reserved</div>
+      <div class="footer-right">nbrz.netlify.app</div>
+    </footer>
+
+  </div>
+</body>
+</html>

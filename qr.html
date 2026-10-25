@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NBRZ — QR Code Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #080808; --bg-card: #141414; --border: rgba(255,255,255,0.07);
+      --text: #e8e6e1; --muted: #7a7775; --dim: #3d3c3a;
+      --gold: #c9a84c; --gold-dim: rgba(201,168,76,0.15);
+      --font: 'Space Grotesk', system-ui, sans-serif;
+    }
+    html { font-size: 16px; }
+    body {
+      background: var(--bg); color: var(--text); font-family: var(--font);
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 2rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 6px; padding: 3rem 2.5rem; max-width: 520px; width: 100%;
+      position: relative;
+    }
+    .card::before, .card::after {
+      content: ''; position: absolute; width: 60px; height: 60px; pointer-events: none;
+    }
+    .card::before { top: 0; left: 0; border-top: 2px solid var(--gold); border-left: 2px solid var(--gold); opacity: 0.4; }
+    .card::after  { bottom: 0; right: 0; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); opacity: 0.4; }
+
+    .logo { font-weight: 700; font-size: 1.1rem; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 0.35rem; }
+    h1 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+    .subtitle { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; line-height: 1.55; }
+
+    label { display: block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+
+    input[type="url"], input[type="text"] {
+      width: 100%; background: #0f0f0f; border: 1px solid var(--border);
+      border-radius: 2px; color: var(--text); font-family: var(--font);
+      font-size: 0.9rem; padding: 0.8rem 1rem; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 1.25rem;
+    }
+    input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim); }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    select {
+      width: 100%; background: #0f0f0f; border: 1px solid var(--border);
+      border-radius: 2px; color: var(--text); font-family: var(--font);
+      font-size: 0.9rem; padding: 0.8rem 1rem; outline: none;
+      transition: border-color 0.2s; margin-bottom: 1.25rem; cursor: pointer;
+    }
+    select:focus { border-color: var(--gold); }
+
+    .btn {
+      width: 100%; font-family: var(--font); font-size: 0.85rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; color: #080808;
+      background: var(--gold); border: none; padding: 0.9rem 2rem;
+      border-radius: 2px; cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .qr-output {
+      display: none; flex-direction: column; align-items: center; gap: 1.5rem;
+      margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);
+    }
+    .qr-output.visible { display: flex; }
+
+    .qr-wrap {
+      background: #fff; border-radius: 4px; padding: 16px;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    .qr-url {
+      font-size: 0.75rem; color: var(--muted); word-break: break-all;
+      text-align: center; max-width: 300px;
+    }
+
+    .qr-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; }
+
+    .btn-sm {
+      font-family: var(--font); font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none;
+      padding: 0.55rem 1.25rem; border-radius: 2px; cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s; border: none;
+    }
+    .btn-sm:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    .btn-download { background: var(--gold); color: #080808; }
+    .btn-print    { background: transparent; color: var(--text); border: 1px solid var(--border); }
+
+    .nfc-tip {
+      margin-top: 1.5rem; padding: 1rem 1.25rem;
+      background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.18);
+      border-radius: 3px; font-size: 0.8rem; color: var(--muted); line-height: 1.6;
+    }
+    .nfc-tip strong { color: var(--gold); display: block; margin-bottom: 0.25rem; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .back { display: block; text-align: center; margin-top: 1.5rem; font-size: 0.75rem; color: var(--dim); text-decoration: none; letter-spacing: 0.06em; transition: color 0.2s; }
+    .back:hover { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <p class="logo">NBRZ</p>
+  <h1>QR + NFC Tool</h1>
+  <p class="subtitle">
+    Paste your shortlink below. Generate a QR code to print, share, or
+    program onto NFC chips. The shortlink is the single point of control —
+    update it anytime without reprinting anything.
+  </p>
+
+  <label for="url-input">Shortlink or URL</label>
+  <input
+    type="url"
+    id="url-input"
+    placeholder="https://tinyurl.com/nbrz"
+    autocomplete="off"
+    spellcheck="false"
+  />
+
+  <div class="row">
+    <div>
+      <label for="qr-size">Size</label>
+      <select id="qr-size">
+        <option value="200">Small (200px) — digital</option>
+        <option value="400" selected>Medium (400px) — print</option>
+        <option value="800">Large (800px) — poster</option>
+        <option value="1200">XL (1200px) — banner</option>
+      </select>
+    </div>
+    <div>
+      <label for="qr-margin">Quiet zone</label>
+      <select id="qr-margin">
+        <option value="1">Tight (1)</option>
+        <option value="2" selected>Normal (2)</option>
+        <option value="4">Wide (4)</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn" id="gen-btn" onclick="generate()">Generate QR Code</button>
+
+  <div class="qr-output" id="qr-output">
+    <div class="qr-wrap">
+      <canvas id="qr-canvas"></canvas>
+    </div>
+    <p class="qr-url" id="qr-url-display"></p>
+    <div class="qr-actions">
+      <button class="btn-sm btn-download" onclick="download()">↓ Download PNG</button>
+      <button class="btn-sm btn-print" onclick="window.print()">Print</button>
+    </div>
+
+    <div class="nfc-tip">
+      <strong>Programming NFC Chips</strong>
+      Copy the URL above. Use the free <strong>NFC Tools</strong> app (iOS/Android) →
+      Write → Add a record → URL → paste your shortlink → Write.
+      Done. Tap any chip to your phone to test it immediately.
+      NTAG213 chips (~$0.30 each on Amazon) work on all phones.
+    </div>
+  </div>
+</div>
+
+<a class="back" href="/">← Back to NBRZ</a>
+
+<script>
+  function generate() {
+    const url = document.getElementById('url-input').value.trim();
+    if (!url) { document.getElementById('url-input').focus(); return; }
+
+    const size   = parseInt(document.getElementById('qr-size').value, 10);
+    const margin = parseInt(document.getElementById('qr-margin').value, 10);
+    const canvas = document.getElementById('qr-canvas');
+
+    QRCode.toCanvas(canvas, url, {
+      width: size,
+      margin: margin,
+      color: { dark: '#000000', light: '#ffffff' },
+      errorCorrectionLevel: 'H',
+    }, (err) => {
+      if (err) { alert('Could not generate QR code. Check the URL.'); return; }
+      document.getElementById('qr-url-display').textContent = url;
+      const out = document.getElementById('qr-output');
+      out.classList.add('visible');
+      out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }
+
+  function download() {
+    const canvas = document.getElementById('qr-canvas');
+    const url    = document.getElementById('url-input').value.trim();
+    const slug   = url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-').slice(0, 40);
+    const link   = document.createElement('a');
+    link.download = `nbrz-qr-${slug}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+
+  document.getElementById('url-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') generate();
+  });
+</script>
+</body>
+</html>

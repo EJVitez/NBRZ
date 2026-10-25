@@ -1,0 +1,9 @@
+[build]
+  publish = "."
+
+# Headers live in /_headers so Netlify and Cloudflare Pages serve the same ones.
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

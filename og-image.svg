@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#8EF0A4"/>
+      <stop offset="50%"  stop-color="#44D4E8"/>
+      <stop offset="100%" stop-color="#2B9EFF"/>
+    </linearGradient>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#060606"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="12" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feBlend in="SourceGraphic" mode="overlay"/>
+    </filter>
+    <radialGradient id="spotlight" cx="40%" cy="50%" r="55%">
+      <stop offset="0%"   stop-color="rgba(68,212,232,0.12)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- BG -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#spotlight)"/>
+  <rect width="1200" height="630" fill="white" filter="url(#grain)" opacity="0.025"/>
+
+  <!-- Left accent bar -->
+  <rect x="0" y="0" width="4" height="630" fill="url(#g)" opacity="0.7"/>
+
+  <!-- NBRZ wordmark — large, left-anchored -->
+  <text x="80" y="410" 
+    font-family="'Barlow Condensed','Arial Black',Impact,sans-serif"
+    font-weight="900" font-size="360" letter-spacing="-8"
+    fill="url(#g)" filter="url(#glow)" opacity="0.95">NBRZ</text>
+
+  <!-- Tagline -->
+  <text x="82" y="496"
+    font-family="'Barlow Condensed','Arial Black',sans-serif"
+    font-weight="700" font-size="22" letter-spacing="6"
+    fill="#44D4E8" opacity="0.6">THE BLOCK IS THE STUDIO.</text>
+
+  <!-- Right side descriptor -->
+  <text x="1120" y="260" text-anchor="end"
+    font-family="'Barlow Condensed','Arial Black',sans-serif"
+    font-weight="700" font-size="13" letter-spacing="5"
+    fill="#333">MUSIC PRODUCTION COLLECTIVE</text>
+
+  <!-- Streaming line -->
+  <text x="1120" y="560" text-anchor="end"
+    font-family="'Barlow Condensed','Arial Black',sans-serif"
+    font-weight="700" font-size="13" letter-spacing="3"
+    fill="#2a2a2a">Spotify  ·  Apple Music  ·  Tidal  ·  Amazon Music</text>
+
+  <!-- Subtle horizontal rule -->
+  <line x1="80" y1="540" x2="1120" y2="540" stroke="#1a1a1a" stroke-width="1"/>
+
+  <!-- nbrz.netlify.app -->
+  <text x="1120" y="590" text-anchor="end"
+    font-family="'Barlow Condensed','Arial Black',sans-serif"
+    font-weight="400" font-size="13" letter-spacing="2"
+    fill="#222">nbrz.netlify.app</text>
+</svg>

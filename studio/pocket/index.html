@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>NBRZ Pocket — play music with your phone</title>
+  <meta name="description" content="NBRZ Pocket: a phone-first instrument. Flow with your fingers, tilt to shape the sound, shake for fills, loop it, record it." />
+  <meta name="theme-color" content="#000000" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="pocket.css" />
+</head>
+<body>
+  <div class="pocket">
+    <header class="bar">
+      <a class="brand" href="../">NBRZ <span>POCKET</span></a>
+      <button class="round play" id="play" aria-label="Play / stop beat">▶</button>
+      <select id="style" aria-label="Beat style">
+        <option value="nbrz">Late night</option>
+        <option value="trap">Trap</option>
+        <option value="drill">Drill</option>
+        <option value="dembow">Dembow</option>
+        <option value="afro">Afro</option>
+        <option value="house">House</option>
+        <option value="lofi">Lo-fi</option>
+        <option value="boombap">Boom bap</option>
+        <option value="clear">No beat</option>
+      </select>
+      <span class="bpm" id="bpm">92</span>
+    </header>
+
+    <main class="flow" id="flow">
+      <canvas id="canvas"></canvas>
+      <div class="flow-hint" id="flow-hint">
+        <b>Touch & slide to play</b>
+        <span>left ↔ right = notes · up = brighter · use several fingers</span>
+      </div>
+      <div class="meters">
+        <span id="tilt-label">Tilt off</span>
+        <span id="loop-label"></span>
+      </div>
+    </main>
+
+    <section class="pads" id="pads">
+      <button data-pad="kick">KICK</button>
+      <button data-pad="snare">SNARE</button>
+      <button data-pad="hat">HAT</button>
+      <button data-pad="clap">CLAP</button>
+    </section>
+
+    <nav class="tools">
+      <button id="motion">Tilt + shake</button>
+      <button id="loop">Loop</button>
+      <button id="clear">Clear</button>
+      <button id="rec" class="rec">● Rec</button>
+      <select id="sound" aria-label="Flow sound">
+        <option value="sawtooth">Saw</option>
+        <option value="triangle">Soft</option>
+        <option value="square">Square</option>
+      </select>
+    </nav>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="pocket.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('../sw.js').catch(() => {});
+  </script>
+</body>
+</html>

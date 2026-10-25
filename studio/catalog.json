@@ -1,0 +1,160 @@
+{
+  "_readme": "NBRZ catalog for the Forge deck. To make a track load instantly for everyone, put the audio file in studio/audio/ and set \"file\": \"audio/<name>.mp3\". Tracks without a file ask for the audio once and remember it in that browser.",
+  "tracks": [
+    {
+      "id": "saltwater-memory",
+      "title": "Saltwater Memory",
+      "file": null
+    },
+    {
+      "id": "vertigo",
+      "title": "Vertigo",
+      "file": null
+    },
+    {
+      "id": "century",
+      "title": "CENTURY",
+      "file": null
+    },
+    {
+      "id": "gold-tinted-glasses",
+      "title": "Gold Tinted Glasses",
+      "file": null
+    },
+    {
+      "id": "quiet-means",
+      "title": "Quiet Means",
+      "file": null
+    },
+    {
+      "id": "into-the-fire",
+      "title": "Into The Fire",
+      "file": null
+    },
+    {
+      "id": "samsara",
+      "title": "Samsara",
+      "file": null
+    },
+    {
+      "id": "sundown-prayer",
+      "title": "Sundown Prayer",
+      "file": null
+    },
+    {
+      "id": "frozen",
+      "title": "Frozen",
+      "file": null
+    },
+    {
+      "id": "blue-light-hotel",
+      "title": "Blue Light Hotel",
+      "file": null
+    },
+    {
+      "id": "golden-era",
+      "title": "Golden Era",
+      "file": null
+    },
+    {
+      "id": "neon-halo",
+      "title": "Neon Halo",
+      "file": null
+    },
+    {
+      "id": "midnight-crossfade",
+      "title": "Midnight Crossfade",
+      "file": null
+    },
+    {
+      "id": "tangerine",
+      "title": "Tangerine",
+      "file": null
+    },
+    {
+      "id": "scenic-route",
+      "title": "Scenic Route",
+      "file": null
+    },
+    {
+      "id": "boom-boom",
+      "title": "BOOM BOOM",
+      "file": null
+    },
+    {
+      "id": "hands-up",
+      "title": "HANDS UP",
+      "file": null
+    },
+    {
+      "id": "crown-in-the-club",
+      "title": "CROWN IN THE CLUB",
+      "file": null
+    },
+    {
+      "id": "wild-all-summer",
+      "title": "Wild All Summer",
+      "file": null
+    },
+    {
+      "id": "poolside-pretty",
+      "title": "Poolside Pretty",
+      "file": null
+    },
+    {
+      "id": "so-ready-for-the-summer",
+      "title": "So Ready (For The Summer)",
+      "file": null
+    },
+    {
+      "id": "beach-baby",
+      "title": "Beach Baby",
+      "file": null
+    },
+    {
+      "id": "savannah-low",
+      "title": "Savannah Low",
+      "file": null
+    },
+    {
+      "id": "construye-el-tuyo",
+      "title": "Construye El Tuyo",
+      "file": null
+    },
+    {
+      "id": "secretos",
+      "title": "Secretos",
+      "file": null
+    },
+    {
+      "id": "no-me-bajo",
+      "title": "No Me Bajo",
+      "file": null
+    },
+    {
+      "id": "butterfly-regret",
+      "title": "Butterfly Regret",
+      "file": null
+    },
+    {
+      "id": "worthy",
+      "title": "Worthy",
+      "file": null
+    },
+    {
+      "id": "don-t-let-me-go",
+      "title": "Don't Let Me Go",
+      "file": null
+    },
+    {
+      "id": "dangerous-love",
+      "title": "DANGEROUS LOVE",
+      "file": null
+    },
+    {
+      "id": "smile-like-sin",
+      "title": "Smile Like Sin",
+      "file": null
+    }
+  ]
+}
