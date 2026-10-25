@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>NBRZ Forge — 3D + Music Studio</title>
+  <meta name="description" content="NBRZ Forge: build 3D models and make music in the same space — in your browser or in VR on Meta Quest 3." />
+  <meta name="theme-color" content="#000000" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="studio.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three/build/three.module.min.js",
+      "three/addons/": "./vendor/three/addons/",
+      "three-mesh-bvh": "./vendor/csg/three-mesh-bvh.module.js",
+      "three-bvh-csg": "./vendor/csg/three-bvh-csg.module.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- ── TOP BAR ─────────────────────────────────────────── -->
+    <header class="topbar">
+      <a class="brand" href="../" title="Back to NBRZ">NBRZ <span>FORGE</span></a>
+
+      <nav class="modes" role="tablist" aria-label="Workspace mode">
+        <button class="mode active" data-mode="build" role="tab" title="Build: place and shape objects">Build</button>
+        <button class="mode" data-mode="sculpt" role="tab" title="Sculpt: push and pull surfaces with a brush">Sculpt</button>
+        <button class="mode" data-mode="sound" role="tab" title="Sound: turn shapes into instruments">Sound</button>
+      </nav>
+
+      <form class="prompt" id="prompt-form" autocomplete="off">
+        <input id="prompt-input" type="text" placeholder="Describe it — “castle with 4 towers”, “crystal cluster”, “trap beat 140”, “text NBRZ”" aria-label="Describe what to build or play" />
+        <label class="ai-toggle" title="Use Claude to interpret any description (needs your own Anthropic API key)">
+          <input type="checkbox" id="ai-toggle" /> <span>AI</span>
+        </label>
+        <button type="submit" class="btn primary">Make</button>
+      </form>
+
+      <div class="top-actions">
+        <button class="icon-btn" id="btn-undo" title="Undo (Ctrl+Z)">↶</button>
+        <button class="icon-btn" id="btn-redo" title="Redo (Ctrl+Shift+Z)">↷</button>
+        <button class="btn" id="btn-import" title="Import GLB / GLTF / OBJ / STL / FBX">Import</button>
+        <div class="dropdown">
+          <button class="btn" id="btn-export">Export ▾</button>
+          <div class="menu" id="export-menu">
+            <button data-export="stl">STL — resin / 3D print</button>
+            <button data-export="glb">GLB — games, Unity, Unreal, Blender</button>
+            <button data-export="obj">OBJ — universal mesh</button>
+            <hr />
+            <button data-export="project">Project file (.nbrz.json)</button>
+          </div>
+        </div>
+        <button class="btn" id="btn-open" title="Open a project file">Open</button>
+        <span id="vr-slot"></span>
+      </div>
+    </header>
+
+    <!-- ── LEFT TOOLBAR ────────────────────────────────────── -->
+    <aside class="panel left" id="left-panel">
+      <section>
+        <h3>Add</h3>
+        <div class="shape-grid" id="shape-grid"></div>
+      </section>
+
+      <section class="build-only">
+        <h3>Transform</h3>
+        <div class="seg" id="gizmo-modes">
+          <button data-gizmo="translate" class="active" title="Move (W)">Move</button>
+          <button data-gizmo="rotate" title="Rotate (E)">Rotate</button>
+          <button data-gizmo="scale" title="Scale (R)">Scale</button>
+        </div>
+        <label class="row"><input type="checkbox" id="snap-toggle" checked /> Snap to grid</label>
+      </section>
+
+      <section class="build-only">
+        <h3>Shape tools</h3>
+        <div class="tool-grid">
+          <button data-op="duplicate" title="Duplicate (Ctrl+D)">Duplicate</button>
+          <button data-op="delete" title="Delete (Del)">Delete</button>
+          <button data-op="mirror" title="Mirror a copy across X">Mirror</button>
+          <button data-op="array" title="Make a ring of copies">Radial ×8</button>
+          <button data-op="arrayLine" title="Make a row of copies">Row ×5</button>
+          <button data-op="floor" title="Drop to floor">To floor</button>
+          <button data-op="union" title="Merge selected into one solid">Union</button>
+          <button data-op="subtract" title="Cut later selections out of the first">Subtract</button>
+          <button data-op="intersect" title="Keep only the overlap">Intersect</button>
+          <button data-op="smooth" title="Toggle smooth / faceted shading">Smooth</button>
+          <button data-op="decimate" title="Reduce polygon count by half (game-ready)">Decimate</button>
+          <button data-op="frame" title="Focus camera on selection (F)">Focus</button>
+          <button data-op="group" title="Group selected (Ctrl+G)">Group</button>
+          <button data-op="ungroup" title="Split a group into parts (Ctrl+Shift+G)">Ungroup</button>
+        </div>
+        <p class="hint">Shift-click to select several. Booleans use the first selection as the base.</p>
+      </section>
+
+      <section class="sculpt-only">
+        <h3>Brush</h3>
+        <div class="seg" id="brush-modes">
+          <button data-brush="inflate" class="active">Inflate</button>
+          <button data-brush="deflate">Dent</button>
+          <button data-brush="smooth">Smooth</button>
+          <button data-brush="flatten">Flatten</button>
+        </div>
+        <label class="slider">Radius <input type="range" id="brush-radius" min="0.02" max="0.5" step="0.01" value="0.12" /></label>
+        <label class="slider">Strength <input type="range" id="brush-strength" min="0.05" max="1" step="0.05" value="0.35" /></label>
+        <label class="row"><input type="checkbox" id="brush-symmetry" checked /> X symmetry</label>
+        <button class="btn wide" data-op="densify">Add detail (subdivide)</button>
+        <p class="hint">Drag on the selected object. Hold Alt and drag to orbit. Sculpting adds detail automatically when needed.</p>
+      </section>
+
+      <section class="sound-only">
+        <h3>Orbit sequencer</h3>
+        <p class="hint">Shapes inside the ring play when the sweep passes them. Angle = timing, height = pitch, shape = sound.</p>
+        <ul class="legend">
+          <li><b>Cube</b> kick</li><li><b>Cylinder</b> snare</li><li><b>Cone / Pyramid</b> hi-hat</li>
+          <li><b>Torus / Ring</b> clap</li><li><b>Sphere / Gem / other</b> synth note</li>
+        </ul>
+        <button class="btn wide" id="btn-orbit-demo">Drop a starter beat</button>
+        <label class="row"><input type="checkbox" id="reactive-toggle" checked /> Shapes pulse to the music</label>
+      </section>
+    </aside>
+
+    <!-- ── VIEWPORT ────────────────────────────────────────── -->
+    <main class="viewport" id="viewport">
+      <div class="hud" id="hud">
+        <span id="hud-mode">BUILD</span>
+        <span id="hud-sel">Nothing selected</span>
+        <span id="hud-poly"></span>
+      </div>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <div class="drop-hint" id="drop-hint">Drop a 3D model or audio file</div>
+    </main>
+
+    <!-- ── RIGHT PANEL ─────────────────────────────────────── -->
+    <aside class="panel right" id="right-panel">
+      <section id="props">
+        <h3>Object</h3>
+        <div id="props-empty" class="hint">Select an object to edit it.</div>
+        <div id="props-body" hidden>
+          <label class="field">Name <input id="p-name" type="text" /></label>
+          <div class="field-row">
+            <label class="field">Color <input id="p-color" type="color" /></label>
+            <label class="field">Finish
+              <select id="p-finish">
+                <option value="matte">Matte</option>
+                <option value="satin">Satin</option>
+                <option value="gloss">Gloss</option>
+                <option value="metal">Metal</option>
+                <option value="chrome">Chrome</option>
+                <option value="glass">Glass</option>
+                <option value="neon">Neon glow</option>
+              </select>
+            </label>
+          </div>
+          <div class="vec" data-vec="position"><span>Position</span><input type="number" step="0.01" /><input type="number" step="0.01" /><input type="number" step="0.01" /></div>
+          <div class="vec" data-vec="rotation"><span>Rotation°</span><input type="number" step="1" /><input type="number" step="1" /><input type="number" step="1" /></div>
+          <div class="vec" data-vec="scale"><span>Scale</span><input type="number" step="0.05" /><input type="number" step="0.05" /><input type="number" step="0.05" /></div>
+          <div class="dims" id="p-dims"></div>
+          <label class="field">Sound
+            <select id="p-sound">
+              <option value="auto">Auto (by shape)</option>
+              <option value="kick">Kick</option>
+              <option value="snare">Snare</option>
+              <option value="hat">Hi-hat</option>
+              <option value="clap">Clap</option>
+              <option value="synth">Synth note</option>
+              <option value="chop">Song chop</option>
+              <option value="none">Silent</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <h3>Scene <span class="count" id="scene-count">0</span></h3>
+        <ul class="outliner" id="outliner"></ul>
+      </section>
+
+      <section>
+        <h3>Print / export</h3>
+        <label class="field">Longest side (mm)
+          <input id="print-size" type="number" min="5" max="1000" step="1" value="80" />
+        </label>
+        <label class="row"><input type="checkbox" id="print-real" /> Real scale (1 unit = 1 m)</label>
+        <p class="hint">STL exports in millimetres, ready for Chitubox / Lychee. GLB keeps colours and materials for games and video.</p>
+      </section>
+
+      <section>
+        <h3>AI key</h3>
+        <p class="hint">Optional. With the AI switch on, Claude turns any description into a scene. Your key stays in this browser only.</p>
+        <input id="api-key" type="password" placeholder="sk-ant-…" autocomplete="off" />
+      </section>
+    </aside>
+
+    <!-- ── STUDIO DRAWER ───────────────────────────────────── -->
+    <section class="studio" id="studio">
+      <div class="studio-bar">
+        <button class="drawer-toggle" id="drawer-toggle" title="Show / hide studio">STUDIO ▴</button>
+        <div class="transport">
+          <button class="icon-btn play" id="btn-play" title="Play / stop (Space)">▶</button>
+          <button class="icon-btn rec" id="btn-rec" title="Record everything you hear">●</button>
+          <label class="mini">BPM <input id="bpm" type="number" min="50" max="200" value="92" /></label>
+          <label class="mini">Swing <input id="swing" type="range" min="0" max="0.6" step="0.02" value="0.08" /></label>
+          <label class="mini">Style
+            <select id="style">
+              <option value="nbrz">NBRZ late night</option>
+              <option value="boombap">Boom bap</option>
+              <option value="trap">Trap</option>
+              <option value="drill">Drill</option>
+              <option value="dembow">Dembow / reggaeton</option>
+              <option value="afro">Afrobeats</option>
+              <option value="house">House</option>
+              <option value="lofi">Lo-fi</option>
+              <option value="clear">Empty</option>
+            </select>
+          </label>
+          <label class="mini">Key
+            <select id="key"></select>
+          </label>
+          <label class="mini">Synth
+            <select id="synth-preset">
+              <option value="keys">Keys</option>
+              <option value="pluck">Pluck</option>
+              <option value="pad">Pad</option>
+              <option value="bass">808 bass</option>
+              <option value="lead">Lead</option>
+            </select>
+          </label>
+          <button class="btn" id="btn-wav" title="Render 4 bars to a WAV file">Bounce WAV</button>
+        </div>
+        <canvas class="scope" id="scope" width="240" height="36" aria-hidden="true"></canvas>
+      </div>
+
+      <div class="studio-body">
+        <div class="seq-wrap">
+          <div class="seq" id="seq"></div>
+        </div>
+
+        <div class="deck">
+          <div class="deck-head">
+            <h3>Deck</h3>
+            <select id="catalog" aria-label="NBRZ catalog"></select>
+          </div>
+          <div class="deck-src">
+            <button class="btn" id="btn-upload-audio">Upload song</button>
+            <form id="url-form" class="url-form">
+              <input id="audio-url" type="url" placeholder="Paste a direct audio link (.mp3 / .wav / .ogg)" />
+              <button class="btn">Load</button>
+            </form>
+            <button class="btn" id="btn-mic" title="Record your voice or an instrument">🎙 Record mic</button>
+          </div>
+          <div class="deck-wave"><canvas id="wave" width="600" height="70"></canvas><div class="deck-title" id="deck-title">No song loaded</div></div>
+          <div class="deck-ctl">
+            <button class="icon-btn" id="deck-play" title="Play / pause song">▶</button>
+            <label class="mini">Speed <input id="deck-rate" type="range" min="0.5" max="1.5" step="0.01" value="1" /></label>
+            <label class="mini">Filter <input id="deck-filter" type="range" min="0" max="1" step="0.01" value="1" /></label>
+            <label class="mini">Echo <input id="deck-echo" type="range" min="0" max="0.8" step="0.01" value="0" /></label>
+            <label class="mini">Space <input id="deck-verb" type="range" min="0" max="1" step="0.01" value="0.15" /></label>
+            <label class="mini">Vol <input id="deck-vol" type="range" min="0" max="1" step="0.01" value="0.8" /></label>
+            <span class="tag" id="deck-bpm"></span>
+          </div>
+          <div class="pads" id="pads" aria-label="Song chops"></div>
+          <p class="hint">Chops: the song is cut into 16 pads (keys 1–8, Q–I). Put them in the CHOP row of the sequencer or on shapes in Sound mode.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <input type="file" id="file-model" accept=".glb,.gltf,.obj,.stl,.fbx" hidden />
+  <input type="file" id="file-project" accept=".json" hidden />
+  <input type="file" id="file-audio" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac" hidden />
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
